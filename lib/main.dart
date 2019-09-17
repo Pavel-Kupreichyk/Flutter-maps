@@ -7,22 +7,38 @@ import 'package:provider/provider.dart';
 import 'package:flutter_maps/src/blocs/main_bloc.dart';
 import 'package:flutter_maps/src/blocs/place_screen_bloc.dart';
 import 'package:flutter_maps/src/managers/alert_manager.dart';
+import 'package:flutter_maps/src/widgets/multi_page_navigation_bar.dart';
+import 'package:flutter_maps/src/managers/route_manager.dart';
+import 'package:flutter_maps/src/managers/upload_manager.dart';
 
 void main() => runApp(App());
 
 class App extends StatelessWidget {
+  final RouteManager _routeManager = RouteManager();
+  final AlertManager _alertManager = AlertManager();
+  final FirestoreService _firestoreService = FirestoreService();
+  final GeolocationService _geolocationService = GeolocationService();
+  final UploadManager _uploadManager = UploadManager();
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: <SingleChildCloneableWidget>[
-        Provider<GeolocationService>.value(value: GeolocationService()),
-        Provider<FirestoreService>.value(value: FirestoreService()),
-        Provider<AlertManager>.value(value: AlertManager()),
+        Provider<GeolocationService>.value(value: _geolocationService),
+        Provider<FirestoreService>.value(value: _firestoreService),
+        Provider<AlertManager>.value(value: _alertManager),
+        Provider<UploadManager>.value(value: _uploadManager),
+        Provider<RouteManager>(
+          builder: (_) => _routeManager,
+          dispose: (_, manager) => manager.dispose(),
+        )
       ],
       child: MaterialApp(
+        navigatorObservers: [_routeManager],
         theme: ThemeData.dark(),
-        home: ProxyProvider2<FirestoreService, GeolocationService, MainBloc>(
-            builder: (_, store, geo, __) => MainBloc(store, geo),
+        builder: (_, child) => MultiPageNavBar(_routeManager, child: child),
+        home: Provider<MainBloc>(
+            builder: (_) => MainBloc(_firestoreService, _geolocationService),
             dispose: (_, bloc) => bloc.dispose(),
             child: Consumer<MainBloc>(
               builder: (_, bloc, __) => MainScreen(bloc),
@@ -31,14 +47,13 @@ class App extends StatelessWidget {
           Widget newScreen;
           switch (settings.name) {
             case '/addEditPlace':
-              newScreen = ProxyProvider2<FirestoreService, GeolocationService,
-                      AddEditPlaceBloc>(
-                  builder: (_, store, geo, __) =>
-                      AddEditPlaceBloc(store, geo, settings.arguments),
+              newScreen = Provider<AddEditPlaceBloc>(
+                  builder: (_) => AddEditPlaceBloc(_firestoreService,
+                      _geolocationService, _uploadManager, settings.arguments),
                   dispose: (_, bloc) => bloc.dispose(),
-                  child: Consumer2<AddEditPlaceBloc, AlertManager>(
-                    builder: (_, bloc, alert, __) =>
-                        AddEditPlaceScreen(bloc, alert),
+                  child: Consumer<AddEditPlaceBloc>(
+                    builder: (_, bloc, __) =>
+                        AddEditPlaceScreen(bloc, _alertManager),
                   ));
               break;
             default:
@@ -51,5 +66,3 @@ class App extends StatelessWidget {
     );
   }
 }
-//google_maps_flutter: ^0.5.21
-//location: ^2.3.5

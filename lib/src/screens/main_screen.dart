@@ -24,33 +24,46 @@ class _MainScreenState extends StateWithBag<MainScreen> {
   static const LatLng blr = LatLng(53.9, 27.56667);
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: StreamBuilder<List<Place>>(
-        stream: widget.bloc.places,
-        builder: (_, snapshot) {
-          return Column(
-            children: <Widget>[
-              Container(
-                height: 350,
-                child: GoogleMap(
-                  initialCameraPosition: CameraPosition(target: blr, zoom: 9),
-                ),
+    return Container(
+      color: Theme.of(context).canvasColor,
+      child: Stack(
+        children: <Widget>[
+          StreamBuilder<List<Place>>(
+            stream: widget.bloc.places,
+            builder: (_, snapshot) {
+              return Column(
+                children: <Widget>[
+                  Container(
+                    height: 350,
+                    child: GoogleMap(
+                      initialCameraPosition: CameraPosition(target: blr, zoom: 9),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                        itemCount: snapshot.data?.length ?? 0,
+                        itemBuilder: (_, id) {
+                          return CustomListTile(snapshot.data[id]);
+                        }),
+                  )
+                ],
+              );
+            },
+          ),
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 15,bottom: 15),
+              child: Align(
+                alignment: FractionalOffset.bottomRight,
+                child: FloatingActionButton(
+                    child: Icon(Icons.add),
+                    onPressed: () => widget.bloc.addButtonPressed()),
               ),
-              Expanded(
-                child: ListView.builder(
-                    itemCount: snapshot.data?.length ?? 0,
-                    itemBuilder: (_, id) {
-                      return CustomListTile(snapshot.data[id]);
-                    }),
-              )
-            ],
-          );
-        },
+            ),
+          )
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          onPressed: () => widget.bloc.addButtonPressed()),
     );
   }
 }

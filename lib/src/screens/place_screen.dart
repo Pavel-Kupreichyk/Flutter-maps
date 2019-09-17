@@ -39,13 +39,33 @@ class _AddEditPlaceScreenState extends StateWithBag<AddEditPlaceScreen> {
           break;
       }
     });
+
+    bag += widget.bloc.result.listen((result) {
+      switch (result) {
+        case AddEditPlaceBlocResult.PlaceAdded:
+          var snackBar = SnackBar(
+            content: Text('Place added successfully'),
+          );
+          Scaffold.of(context).showSnackBar(snackBar);
+          break;
+        case AddEditPlaceBlocResult.PlaceAddedAndImageIsLoading:
+          var snackBar = SnackBar(
+            content:
+                Text('Place added successfully, but image is still loading'),
+          );
+          Scaffold.of(context).showSnackBar(snackBar);
+          break;
+      }
+
+      Navigator.pop(context);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Stack(
+    return Container(
+      color: Theme.of(context).canvasColor,
+      child: Stack(
         children: <Widget>[
           Column(
             //crossAxisAlignment: CrossAxisAlignment.start,

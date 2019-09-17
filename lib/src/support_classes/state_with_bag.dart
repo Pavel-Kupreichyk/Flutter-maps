@@ -6,6 +6,10 @@ abstract class StateWithBag<T extends StatefulWidget> extends State<T> {
 
   void setupBindings();
 
+  bool shouldRebindAfterUpdate(T oldWidget) {
+    return true;
+  }
+
   @override
   void initState() {
     setupBindings();
@@ -14,8 +18,10 @@ abstract class StateWithBag<T extends StatefulWidget> extends State<T> {
 
   @override
   void didUpdateWidget(T oldWidget) {
-    bag.dispose();
-    setupBindings();
+    if(shouldRebindAfterUpdate(oldWidget)) {
+      bag.dispose();
+      setupBindings();
+    }
     super.didUpdateWidget(oldWidget);
   }
 
