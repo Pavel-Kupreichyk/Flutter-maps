@@ -21,9 +21,9 @@ class CustomListTile extends StatelessWidget {
               AspectRatio(
                 aspectRatio: 1,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(4),
-                      bottomLeft: Radius.circular(4)),
+                  borderRadius: const BorderRadius.only(
+                      topLeft: const Radius.circular(4),
+                      bottomLeft: const Radius.circular(4)),
                   child: _buildImageWidget(_place.imageUrl),
                 ),
               ),
@@ -52,8 +52,8 @@ class CustomListTile extends StatelessWidget {
     }
     return CachedNetworkImage(
       placeholder: (context, url) => Container(
-          child: Center(child: CircularProgressIndicator()), width: 100),
-      imageUrl: imageUrl,
+          child: const Center(child: CircularProgressIndicator()), width: 100),
+      imageUrl: imageUrl,//'https://image.tmdb.org/t/p/original/kqjL17yufvn9OVLyXYpvtyrFfak.jpg', //<- For tests
       alignment: Alignment.topCenter,
       fit: BoxFit.cover,
     );
@@ -95,9 +95,9 @@ class CustomListTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              Text(
+              const Text(
                 ' · ★',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12.0,
                   color: Colors.white54,
                 ),

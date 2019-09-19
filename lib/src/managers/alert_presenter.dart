@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 enum ConfirmAction { cancel, accept }
 
-class AlertManager {
+class AlertPresenter {
   Future<ConfirmAction> showPermissionDialog(BuildContext context) {
     return showDialog<ConfirmAction>(
         context: context,

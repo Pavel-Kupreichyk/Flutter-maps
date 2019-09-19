@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
+enum ButtonType { camera, gallery, remove }
+
 class AnimatedBottomMenu extends StatefulWidget {
   final bool isOpen;
-  final Function() onFirstBtnPressed;
-  final Function() onSecondBtnPressed;
+  final Function(ButtonType) onButtonPressed;
 
-  AnimatedBottomMenu(
-      {this.isOpen = false, this.onFirstBtnPressed, this.onSecondBtnPressed});
+  AnimatedBottomMenu({
+    this.isOpen = false,
+    this.onButtonPressed,
+  });
 
   @override
   State<StatefulWidget> createState() => AnimatedBottomMenuState();
@@ -14,7 +17,8 @@ class AnimatedBottomMenu extends StatefulWidget {
 
 class AnimatedBottomMenuState extends State<AnimatedBottomMenu>
     with SingleTickerProviderStateMixin {
-  final double menuHeight = 80;
+  static const double menuHeight = 80;
+  static const double blurRadius = 20;
   AnimationController _controller;
   Animation<double> _animation;
 
@@ -23,8 +27,9 @@ class AnimatedBottomMenuState extends State<AnimatedBottomMenu>
     super.initState();
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 200));
-    _animation = Tween<double>(begin: menuHeight, end: 0).animate(_controller)
-      ..addListener(() => setState(() {}));
+    _animation = Tween<double>(begin: menuHeight + blurRadius, end: 0)
+        .animate(_controller)
+          ..addListener(() => setState(() {}));
     _animateMenu();
   }
 
@@ -42,6 +47,10 @@ class AnimatedBottomMenuState extends State<AnimatedBottomMenu>
 
   @override
   Widget build(BuildContext context) {
+    if (_animation.value == (menuHeight + blurRadius)) {
+      return Container();
+    }
+
     return Transform.translate(
       offset: Offset(0, _animation.value),
       child: Align(
@@ -50,59 +59,67 @@ class AnimatedBottomMenuState extends State<AnimatedBottomMenu>
           height: menuHeight,
           decoration: BoxDecoration(
             boxShadow: [
-              BoxShadow(
+              const BoxShadow(
                 color: Colors.blueGrey,
-                blurRadius: 20.0, // has the effect of softening the shadow
-                spreadRadius: 4.0, // has the effect of extending the shadow
+                blurRadius: blurRadius,
+                spreadRadius: 4.0,
                 offset: Offset(
-                  8.0, // horizontal, move right 10
-                  8.0, // vertical, move down 10
+                  8.0,
+                  8.0,
                 ),
               )
             ],
             color: Colors.black54,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Container(
-                    height: menuHeight,
-                    width: 60,
-                    child: FlatButton(
-                      child: Icon(Icons.image),
-                      onPressed: () {
-                        if (widget.onFirstBtnPressed != null) {
-                          widget.onFirstBtnPressed();
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    _MenuButton(
+                      width: 60,
+                      height: menuHeight,
+                      child: const Icon(Icons.image),
+                      onClick: () {
+                        if (widget.onButtonPressed != null) {
+                          widget.onButtonPressed(ButtonType.gallery);
                         }
                         _controller.reverse();
                       },
                     ),
-                  ),
-                  Container(
-                    height: menuHeight,
-                    width: 60,
-                    child: FlatButton(
-                      child: Icon(Icons.camera_alt),
-                      onPressed: () {
-                        if (widget.onFirstBtnPressed != null) {
-                          widget.onSecondBtnPressed();
+                    _MenuButton(
+                      width: 60,
+                      height: menuHeight,
+                      child: const Icon(Icons.camera_alt),
+                      onClick: () {
+                        if (widget.onButtonPressed != null) {
+                          widget.onButtonPressed(ButtonType.camera);
                         }
                         _controller.reverse();
                       },
                     ),
-                  )
-                ],
-              ),
-              Container(
-                height: menuHeight,
-                child: FlatButton(
-                  child: Text('Hide Panel'),
-                  onPressed: () => _controller.reverse(),
+                    _MenuButton(
+                      width: 60,
+                      height: menuHeight,
+                      child: const Icon(Icons.close),
+                      onClick: () {
+                        if (widget.onButtonPressed != null) {
+                          widget.onButtonPressed(ButtonType.remove);
+                        }
+                        _controller.reverse();
+                      },
+                    ),
+                  ],
                 ),
-              )
-            ],
+                _MenuButton(
+                  height: menuHeight,
+                  child: const Text('Hide Panel'),
+                  onClick: _controller.reverse,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -115,5 +132,26 @@ class AnimatedBottomMenuState extends State<AnimatedBottomMenu>
     } else {
       _controller.reverse();
     }
+  }
+}
+
+class _MenuButton extends StatelessWidget {
+  final double height;
+  final double width;
+  final Widget child;
+  final Function onClick;
+
+  _MenuButton({this.child, this.height, this.width, this.onClick});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      width: width,
+      child: FlatButton(
+        child: child,
+        onPressed: onClick,
+      ),
+    );
   }
 }

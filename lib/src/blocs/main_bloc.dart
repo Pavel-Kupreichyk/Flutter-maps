@@ -4,6 +4,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:flutter_maps/src/models/place.dart';
 import 'package:flutter_maps/src/support_classes/navigation_info.dart';
 import 'package:flutter_maps/src/support_classes/disposable.dart';
+import 'package:flutter_maps/src/screens/place_screen.dart';
 
 class MainBloc implements Disposable {
   final FirestoreService _firestoreService;
@@ -13,7 +14,7 @@ class MainBloc implements Disposable {
   PublishSubject<NavigationInfo> _navigation = PublishSubject();
 
   MainBloc(this._firestoreService, this._geolocationService) {
-    updatePlaces();
+    refreshPlaces();
   }
 
   //Outputs
@@ -21,13 +22,13 @@ class MainBloc implements Disposable {
   Observable<NavigationInfo> get navigation => _navigation;
 
   //Input functions
-  updatePlaces() async {
+  refreshPlaces() async {
     var places = await _firestoreService.fetchPlaces();
     _places.sink.add(places);
   }
 
   addButtonPressed() {
-    _navigation.sink.add(NavigationInfo('/addEditPlace'));
+    _navigation.sink.add(NavigationInfo(AddEditPlaceScreen.route));
   }
 
   @override

@@ -5,29 +5,39 @@ import 'package:flutter_maps/src/models/upload_snapshot.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:flutter_maps/src/support_classes/disposable.dart';
 
+class _Upload {
+  final StorageUploadTask task;
+  UploadSnapshot currSnapshot;
+  StreamSubscription subscription;
+
+  _Upload(this.task);
+
+  close() {
+    subscription?.cancel();
+    if(task.isInProgress) {
+      task.cancel();
+    }
+  }
+}
+
 class UploadManager implements Disposable {
-  final Map<String, UploadSnapshot> _currSnapshots = {};
-  final Map<String, StreamSubscription> _subscriptions = {};
-  final Map<String, StorageUploadTask> _tasks = {};
+  final Map<String, _Upload> _uploads = {};
 
   BehaviorSubject<List<UploadSnapshot>> _snapshots = BehaviorSubject();
 
   //Outputs
-  Observable<List<UploadSnapshot>> get snapshot => _snapshots;
+  Observable<List<UploadSnapshot>> get snapshots => _snapshots;
 
   addFirebaseUpload(StorageUploadTask uploadTask, String name) {
-    _tasks[name] = uploadTask;
-    _subscriptions[name] = uploadTask.events.listen((event) {
+    var upload = _Upload(uploadTask);
+    upload.subscription= uploadTask.events.listen((event) {
       UploadState state;
       switch (event.type) {
         case StorageTaskEventType.progress:
           state = UploadState.progress;
-
-          print('progress');
           break;
         case StorageTaskEventType.success:
           state = UploadState.success;
-          print('success');
           break;
         case StorageTaskEventType.pause:
           state = UploadState.pause;
@@ -39,26 +49,34 @@ class UploadManager implements Disposable {
           state = UploadState.progress;
           break;
       }
-      print('${event.snapshot.bytesTransferred}/${event.snapshot.totalByteCount}');
-
-      _currSnapshots[name] = UploadSnapshot(name, state,
+      upload.currSnapshot = UploadSnapshot(name, state,
           event.snapshot.totalByteCount, event.snapshot.bytesTransferred);
-      _snapshots.sink.add(_currSnapshots.values.toList());
+      _emitSnapshots();
     });
+    _uploads[name] = upload;
   }
 
   pauseUpload(String name) {
-    _tasks[name].pause();
+    _uploads[name].task.pause();
   }
 
   resumeUpload(String name) {
-    _tasks[name].resume();
+    _uploads[name].task.resume();
   }
 
   removeUpload(String name) {
-    _subscriptions[name].cancel();
-    _tasks[name].cancel();
-    _currSnapshots.remove(name);
+    _uploads[name].close();
+    _uploads.remove(name);
+    _emitSnapshots();
+  }
+
+  _emitSnapshots() {
+    var snapshots = _uploads.values
+        .map((upload) => upload.currSnapshot)
+        .where((el) => el != null)
+        .toList();
+
+    _snapshots.sink.add(snapshots);
   }
 
   @override

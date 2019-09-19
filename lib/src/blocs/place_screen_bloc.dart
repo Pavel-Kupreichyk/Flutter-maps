@@ -25,6 +25,7 @@ class AddEditPlaceBloc implements Disposable {
   BehaviorSubject<Place> _place;
   BehaviorSubject<File> _image = BehaviorSubject();
   BehaviorSubject<bool> _bottomMenuState = BehaviorSubject.seeded(false);
+  BehaviorSubject<bool> _isLoading = BehaviorSubject.seeded(false);
   PublishSubject<NavigationInfo> _navigation = PublishSubject();
   PublishSubject<AddEditPlaceBlocError> _error = PublishSubject();
   PublishSubject<AddEditPlaceBlocResult> _result = PublishSubject();
@@ -42,11 +43,13 @@ class AddEditPlaceBloc implements Disposable {
   Observable<AddEditPlaceBlocError> get error => _error;
   Observable<AddEditPlaceBlocResult> get result => _result;
   Observable<bool> get bottomMenuState => _bottomMenuState;
+  Observable<bool> get isLoading => _isLoading;
   Observable<File> get image => _image;
 
   //Input functions
 
   updatePlaces(String name, String about) async {
+    _isLoading.sink.add(true);
     if (!await _geolocationService.hasGeolocationServicePermission()) {
       _error.sink.add(AddEditPlaceBlocError.permissionNotProvided);
       return;
@@ -64,6 +67,7 @@ class AddEditPlaceBloc implements Disposable {
         _uploadManager.addFirebaseUpload(loadingTask, '${name}_image');
       }
     }
+    _isLoading.sink.add(false);
   }
 
   requestLocationPermission() async {
@@ -75,10 +79,15 @@ class AddEditPlaceBloc implements Disposable {
   }
 
   addImage(ImageSource source) async {
-    var image = await ImagePicker.pickImage(source: source);
+    var image = await ImagePicker.pickImage(
+        source: source, maxWidth: 1000, maxHeight: 1000,);
     if (image != null) {
       _image.add(image);
     }
+  }
+
+  removeImage() {
+    _image.add(null);
   }
 
   //Private functions

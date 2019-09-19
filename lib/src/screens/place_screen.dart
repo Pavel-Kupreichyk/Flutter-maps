@@ -1,17 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/place_screen_bloc.dart';
-import 'package:flutter_maps/src/managers/alert_manager.dart';
-import 'package:flutter_maps/src/models/place.dart';
-import 'package:flutter_maps/src/widgets/place_text_form.dart';
+import 'package:flutter_maps/src/managers/alert_presenter.dart';
 import 'package:flutter_maps/src/support_classes/state_with_bag.dart';
 import 'package:flutter_maps/src/widgets/animated_bottom_menu.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class AddEditPlaceScreen extends StatefulWidget {
+  static const route = '/addEditPlaceScreen';
   final AddEditPlaceBloc bloc;
-  final AlertManager alertManager;
+  final AlertPresenter alertManager;
 
   AddEditPlaceScreen(this.bloc, this.alertManager);
 
@@ -41,21 +40,23 @@ class _AddEditPlaceScreenState extends StateWithBag<AddEditPlaceScreen> {
     });
 
     bag += widget.bloc.result.listen((result) {
+      String text;
       switch (result) {
         case AddEditPlaceBlocResult.PlaceAdded:
-          var snackBar = SnackBar(
-            content: Text('Place added successfully'),
-          );
-          Scaffold.of(context).showSnackBar(snackBar);
+          text = 'Place added successfully';
           break;
         case AddEditPlaceBlocResult.PlaceAddedAndImageIsLoading:
-          var snackBar = SnackBar(
-            content:
-                Text('Place added successfully, but image is still loading'),
-          );
-          Scaffold.of(context).showSnackBar(snackBar);
+          text = 'Place added successfully, but image is still uploading';
           break;
       }
+      var snackBar = SnackBar(
+        content: Text(
+          text,
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.black87,
+      );
+      Scaffold.of(context).showSnackBar(snackBar);
 
       Navigator.pop(context);
     });
@@ -67,33 +68,41 @@ class _AddEditPlaceScreenState extends StateWithBag<AddEditPlaceScreen> {
       color: Theme.of(context).canvasColor,
       child: Stack(
         children: <Widget>[
-          Column(
-            //crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              StreamBuilder<File>(
-                stream: widget.bloc.image,
-                builder: (_, snapshot) {
-                  return _buildImageView(snapshot.data);
-                },
-              ),
-              StreamBuilder<Place>(
-                stream: widget.bloc.place,
-                builder: (_, snapshot) {
-                  return PlaceTextForm(
-                      place: snapshot.data, onSubmit: widget.bloc.updatePlaces);
-                },
-              ),
-            ],
+          SafeArea(
+            child: ListView(
+              children: <Widget>[
+                Center(
+                  child: StreamBuilder<File>(
+                    stream: widget.bloc.image,
+                    builder: (_, snapshot) {
+                      return _buildImageView(snapshot.data);
+                    },
+                  ),
+                ),
+                Center(
+                  child: _PlaceTextForm(widget.bloc),
+                ),
+              ],
+            ),
           ),
           StreamBuilder<bool>(
             stream: widget.bloc.bottomMenuState,
             builder: (_, snapshot) {
               return AnimatedBottomMenu(
                 isOpen: snapshot.data ?? false,
-                onFirstBtnPressed: () =>
-                    widget.bloc.addImage(ImageSource.gallery),
-                onSecondBtnPressed: () =>
-                    widget.bloc.addImage(ImageSource.camera),
+                onButtonPressed: (type) {
+                  switch (type) {
+                    case ButtonType.camera:
+                      widget.bloc.addImage(ImageSource.camera);
+                      break;
+                    case ButtonType.gallery:
+                      widget.bloc.addImage(ImageSource.gallery);
+                      break;
+                    case ButtonType.remove:
+                      widget.bloc.removeImage();
+                      break;
+                  }
+                },
               );
             },
           ),
@@ -121,13 +130,121 @@ class _AddEditPlaceScreenState extends StateWithBag<AddEditPlaceScreen> {
         ),
         FloatingActionButton(
           heroTag: 'unique1',
-          child: Icon(Icons.add),
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
+          backgroundColor: Colors.blueGrey,
           shape: RoundedRectangleBorder(
               borderRadius:
-                  BorderRadius.only(bottomRight: Radius.circular(16))),
+                  const BorderRadius.only(bottomRight: Radius.circular(16))),
           onPressed: () => widget.bloc.addPhotoButtonPressed(),
         ),
       ],
+    );
+  }
+}
+
+class _PlaceTextForm extends StatefulWidget {
+  final AddEditPlaceBloc bloc;
+  _PlaceTextForm(this.bloc);
+  @override
+  State<StatefulWidget> createState() => _PlaceTextFormState();
+}
+
+class _PlaceTextFormState extends StateWithBag<_PlaceTextForm> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _aboutController = TextEditingController();
+
+  @override
+  void setupBindings() {
+    bag += widget.bloc.place.listen((place) {
+      _nameController.value = TextEditingValue(text: place?.name ?? '');
+      _aboutController.value = TextEditingValue(text: place?.about ?? '');
+    });
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _aboutController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            TextFormField(
+              decoration: InputDecoration(
+                labelText: 'Name',
+              ),
+              controller: _nameController,
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              decoration: InputDecoration(
+                labelText: 'About',
+              ),
+              controller: _aboutController,
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: StreamBuilder<bool>(
+                stream: widget.bloc.isLoading,
+                builder: (_, snapshot) {
+                  var isLoading = snapshot.data ?? false;
+                  return Row(
+                    children: <Widget>[
+                      RaisedButton(
+                        color: Colors.blueGrey,
+                        onPressed: isLoading
+                            ? null
+                            : () {
+                                if (_formKey.currentState.validate()) {
+                                  widget.bloc.updatePlaces(_nameController.text,
+                                      _aboutController.text);
+                                }
+                              },
+                        child: const Text('Submit'),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: Container(
+                          height: 25,
+                          width: 25,
+                          child: isLoading
+                              ? const CircularProgressIndicator()
+                              : null,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
