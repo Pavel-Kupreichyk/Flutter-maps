@@ -47,7 +47,7 @@ class App extends StatelessWidget {
         theme: ThemeData.dark(),
         builder: (_, child) => AppBarBuilder(child: child,),
         home: Provider<MainBloc>(
-            builder: (_) => MainBloc(_firestoreService, _geolocationService),
+            builder: (_) => MainBloc(_firestoreService),
             dispose: (_, bloc) => bloc.dispose(),
             child: Consumer<MainBloc>(
               builder: (_, bloc, __) => MainScreen(bloc),

@@ -48,14 +48,10 @@ class AddEditPlaceBloc implements Disposable {
 
   //Input functions
 
-  updatePlaces(String name, String about) async {
+  addPlace(String name, String about) async {
     _isLoading.sink.add(true);
-    if (!await _geolocationService.hasGeolocationServicePermission()) {
-      _error.sink.add(AddEditPlaceBlocError.permissionNotProvided);
-      return;
-    }
-
     LocationData location = await _getLocationOrEmitError();
+
     if (location != null) {
       var loadingTask = await _firestoreService.addNewPlace(
           name, about, _image.value, location.latitude, location.longitude);
@@ -119,5 +115,6 @@ class AddEditPlaceBloc implements Disposable {
     _bottomMenuState.close();
     _image.close();
     _result.close();
+    _isLoading.close();
   }
 }

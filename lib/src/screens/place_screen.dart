@@ -221,7 +221,7 @@ class _PlaceTextFormState extends StateWithBag<_PlaceTextForm> {
                             ? null
                             : () {
                                 if (_formKey.currentState.validate()) {
-                                  widget.bloc.updatePlaces(_nameController.text,
+                                  widget.bloc.addPlace(_nameController.text,
                                       _aboutController.text);
                                 }
                               },

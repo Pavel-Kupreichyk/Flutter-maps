@@ -1,5 +1,4 @@
 import 'package:flutter_maps/src/services/firestore_service.dart';
-import 'package:flutter_maps/src/services/geolocation_service.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:flutter_maps/src/models/place.dart';
 import 'package:flutter_maps/src/support_classes/navigation_info.dart';
@@ -8,12 +7,11 @@ import 'package:flutter_maps/src/screens/place_screen.dart';
 
 class MainBloc implements Disposable {
   final FirestoreService _firestoreService;
-  final GeolocationService _geolocationService;
 
   BehaviorSubject<List<Place>> _places = BehaviorSubject();
   PublishSubject<NavigationInfo> _navigation = PublishSubject();
 
-  MainBloc(this._firestoreService, this._geolocationService) {
+  MainBloc(this._firestoreService) {
     refreshPlaces();
   }
 

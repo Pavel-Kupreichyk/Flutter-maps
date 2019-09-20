@@ -33,6 +33,7 @@ dependencies:
   location: ^2.3.5
   image_picker: ^0.6.1+4
   cached_network_image: ^1.1.1
+  mockito: ^4.1.1
 
 dev_dependencies:
   flutter_test:
