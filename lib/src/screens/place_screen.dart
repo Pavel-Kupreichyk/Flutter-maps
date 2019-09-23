@@ -10,9 +10,9 @@ import 'dart:io';
 class AddEditPlaceScreen extends StatefulWidget {
   static const route = '/addEditPlaceScreen';
   final AddEditPlaceBloc bloc;
-  final AlertPresenter alertManager;
+  final AlertPresenter alertPresenter;
 
-  AddEditPlaceScreen(this.bloc, this.alertManager);
+  AddEditPlaceScreen(this.bloc, this.alertPresenter);
 
   @override
   State<StatefulWidget> createState() => _AddEditPlaceScreenState();
@@ -31,32 +31,25 @@ class _AddEditPlaceScreenState extends StateWithBag<AddEditPlaceScreen> {
           _requestPermission();
           break;
         case AddEditPlaceBlocError.servicesDisabled:
-          widget.alertManager.showDisabledDialog(context);
+          widget.alertPresenter.showDisabledDialog(context);
           break;
         case AddEditPlaceBlocError.unexpectedError:
-          widget.alertManager.showErrorDialog(context);
+          widget.alertPresenter.showErrorDialog(context);
           break;
       }
     });
 
     bag += widget.bloc.result.listen((result) {
-      String text;
       switch (result) {
         case AddEditPlaceBlocResult.PlaceAdded:
-          text = 'Place added successfully';
+          widget.alertPresenter
+              .showStandardSnackBar(context, 'Place added successfully');
           break;
         case AddEditPlaceBlocResult.PlaceAddedAndImageIsLoading:
-          text = 'Place added successfully, but image is still uploading';
+          widget.alertPresenter.showStandardSnackBar(context,
+              'Place added successfully, but image is still uploading');
           break;
       }
-      var snackBar = SnackBar(
-        content: Text(
-          text,
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.black87,
-      );
-      Scaffold.of(context).showSnackBar(snackBar);
 
       Navigator.pop(context);
     });
@@ -112,7 +105,7 @@ class _AddEditPlaceScreenState extends StateWithBag<AddEditPlaceScreen> {
   }
 
   _requestPermission() async {
-    await widget.alertManager.showPermissionDialog(context);
+    await widget.alertPresenter.showPermissionDialog(context);
     widget.bloc.requestLocationPermission();
   }
 

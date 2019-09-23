@@ -77,4 +77,16 @@ class AlertPresenter {
               ],
             ));
   }
+
+  showStandardSnackBar(BuildContext context, String text) {
+
+    var snackBar = SnackBar(
+      content: Text(
+        text,
+        style: TextStyle(color: Colors.white),
+      ),
+      backgroundColor: Colors.black87,
+    );
+    Scaffold.of(context).showSnackBar(snackBar);
+  }
 }

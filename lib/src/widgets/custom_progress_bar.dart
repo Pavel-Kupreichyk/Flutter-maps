@@ -27,7 +27,6 @@ class _CustomProgressBarState extends State<CustomProgressBar>
       ..addListener(() {
         setState(() {});
       });
-    print(111);
     controller.animateTo(_calcPercent(), duration: Duration(milliseconds: 250));
   }
 

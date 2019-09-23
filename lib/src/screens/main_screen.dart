@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_maps/src/widgets/custom_list_tile.dart';
 import 'package:flutter_maps/src/widgets/custom_layout_builder.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_maps/src/widgets/custom_map.dart';
 
 class MainScreen extends StatefulWidget {
   static const route = '/';
@@ -17,7 +18,6 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends StateWithBag<MainScreen> {
-
   @override
   void setupBindings() {
     bag += widget.bloc.navigation.listen((navInfo) {
@@ -37,11 +37,20 @@ class _MainScreenState extends StateWithBag<MainScreen> {
               switch (screenType) {
                 case Layout.wide:
                   return Row(
-                    children: _buildLayout(width: constraints.maxWidth / 2),
+                    children: <Widget>[
+                      Container(
+                          width: constraints.maxWidth / 2, child: const _Map()),
+                      const _PlacesList()
+                    ],
                   );
                 case Layout.slim:
                   return Column(
-                    children: _buildLayout(height: constraints.maxHeight / 2),
+                    children: <Widget>[
+                      Container(
+                          height: constraints.maxHeight / 2,
+                          child: const _Map()),
+                      const _PlacesList()
+                    ],
                   );
                 default:
                   throw 'Unexpected screen type';
@@ -68,20 +77,6 @@ class _MainScreenState extends StateWithBag<MainScreen> {
       ),
     );
   }
-
-  List<Widget> _buildLayout({double height, double width}) {
-    return [
-      Container(
-        width: width,
-        height: height,
-        child: const GoogleMap(
-          initialCameraPosition: const CameraPosition(target: blr, zoom: 9),
-          myLocationButtonEnabled: false,
-        ),
-      ),
-      const _PlacesList(),
-    ];
-  }
 }
 
 class _PlacesList extends StatelessWidget {
@@ -106,10 +101,31 @@ class _PlacesList extends StatelessWidget {
                 physics: const AlwaysScrollableScrollPhysics(),
                 itemCount: snapshot.data?.length ?? 0,
                 itemBuilder: (_, id) {
-                  return CustomListTile(snapshot.data[id]);
+                  var place = snapshot.data[id];
+                  return CustomListTile(place,
+                      onItemSelected: () =>
+                          bloc.showLocation(place.lat, place.lng));
                 },
               ),
             ),
+          );
+        });
+  }
+}
+
+class _Map extends StatelessWidget {
+  const _Map();
+
+  @override
+  Widget build(BuildContext context) {
+    var bloc = Provider.of<MainBloc>(context);
+    return StreamBuilder<List<Place>>(
+        stream: bloc.places,
+        builder: (_, snapshot) {
+          print(snapshot.data?.length);
+          return CustomMap(
+            bloc,
+            places: snapshot.data ?? [],
           );
         });
   }

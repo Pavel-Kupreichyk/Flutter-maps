@@ -54,7 +54,6 @@ class CustomListTile extends StatelessWidget {
       placeholder: (context, url) => Container(
           child: const Center(child: CircularProgressIndicator()), width: 100),
       imageUrl: imageUrl,//'https://image.tmdb.org/t/p/original/kqjL17yufvn9OVLyXYpvtyrFfak.jpg', //<- For tests
-      alignment: Alignment.topCenter,
       fit: BoxFit.cover,
     );
   }
