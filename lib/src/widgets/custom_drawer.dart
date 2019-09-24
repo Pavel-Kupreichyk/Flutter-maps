@@ -46,64 +46,61 @@ class _CustomDrawerState extends StateWithBag<CustomDrawer> {
   Widget build(BuildContext context) {
     return Drawer(
       child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              ListTile(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            ListTile(
+              title: Text(
+                'Settings',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              leading: Icon(Icons.settings),
+            ),
+            StreamBuilder<bool>(
+              stream: widget.bloc.isUserLoggedIn,
+              builder: (_, snapshot) {
+                if (snapshot.data ?? false) {
+                  return ListTile(
+                    title: Text(
+                      'Log out',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                    leading: Icon(Icons.exit_to_app),
+                    onTap: widget.bloc.logOut,
+                  );
+                }
+                return Container();
+              },
+            ),
+            ListTile(
                 title: Text(
-                  'Settings',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                leading: Icon(Icons.settings),
-              ),
-              StreamBuilder<bool>(
-                stream: widget.bloc.isUserLoggedIn,
-                builder: (_, snapshot) {
-                  if (snapshot.data == true) {
-                    return ListTile(
-                      title: Text(
-                        'Log out',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600),
-                      ),
-                      leading: Icon(Icons.exit_to_app),
-                      onTap: widget.bloc.logOut,
+              'Uploads',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            )),
+            Expanded(
+              child: StreamBuilder<List<UploadSnapshot>>(
+                  stream: widget.bloc.snapshots,
+                  builder: (_, snapshot) {
+                    return ListView.builder(
+                      itemCount: snapshot.data?.length ?? 0,
+                      itemBuilder: (context, id) {
+                        var data = snapshot.data[id];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          child: CustomProgressBar(
+                            data,
+                            measureName: 'Kb',
+                            measureDivider: 1024,
+                            onRemoveButtonPressed: () =>
+                                widget.bloc.removeUpload(data.name),
+                          ),
+                        );
+                      },
                     );
-                  }
-                  return Container();
-                },
-              ),
-              ListTile(
-                  title: Text(
-                'Uploads',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              )),
-              Expanded(
-                child: StreamBuilder<List<UploadSnapshot>>(
-                    stream: widget.bloc.snapshots,
-                    builder: (_, snapshot) {
-                      return ListView.builder(
-                        itemCount: snapshot.data?.length ?? 0,
-                        itemBuilder: (context, id) {
-                          var data = snapshot.data[id];
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: CustomProgressBar(
-                              data,
-                              measureName: 'Kb',
-                              measureDivider: 1024,
-                              onRemoveButtonPressed: () =>
-                                  widget.bloc.removeUpload(data.name),
-                            ),
-                          );
-                        },
-                      );
-                    }),
-              ),
-            ],
-          ),
+                  }),
+            ),
+          ],
         ),
       ),
     );
