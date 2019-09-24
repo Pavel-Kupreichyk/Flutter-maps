@@ -4,14 +4,14 @@ import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/support_classes/disposable.dart';
 import 'package:rxdart/rxdart.dart';
 
-class MultiPageNavBarBloc implements Disposable {
+class CustomDrawerBloc implements Disposable {
   final UploadManager _uploadManager;
   final AuthService _authService;
 
   BehaviorSubject<bool> _isUserLoggedIn = BehaviorSubject();
   PublishSubject<void> _userLoggedOut = PublishSubject();
 
-  MultiPageNavBarBloc(this._uploadManager, this._authService) {
+  CustomDrawerBloc(this._uploadManager, this._authService) {
     _getUser();
   }
 

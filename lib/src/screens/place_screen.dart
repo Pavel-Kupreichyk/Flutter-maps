@@ -2,10 +2,32 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/place_screen_bloc.dart';
 import 'package:flutter_maps/src/managers/alert_presenter.dart';
+import 'package:flutter_maps/src/managers/upload_manager.dart';
+import 'package:flutter_maps/src/services/firestore_service.dart';
+import 'package:flutter_maps/src/services/geolocation_service.dart';
 import 'package:flutter_maps/src/support_classes/state_with_bag.dart';
 import 'package:flutter_maps/src/widgets/animated_bottom_menu.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:provider/provider.dart';
+
+class PlaceScreenBuilder extends StatelessWidget {
+  final Object _arg;
+
+  PlaceScreenBuilder(this._arg);
+
+  @override
+  Widget build(BuildContext context) {
+    return ProxyProvider3<FirestoreService, GeolocationService, UploadManager,
+            AddEditPlaceBloc>(
+        builder: (_, firestore, geo, upload, __) =>
+            AddEditPlaceBloc(firestore, geo, upload, _arg),
+        dispose: (_, bloc) => bloc.dispose(),
+        child: Consumer2<AddEditPlaceBloc, AlertPresenter>(
+          builder: (_, bloc, alert, __) => AddEditPlaceScreen(bloc, alert),
+        ));
+  }
+}
 
 class AddEditPlaceScreen extends StatefulWidget {
   static const route = '/addEditPlaceScreen';
@@ -57,9 +79,11 @@ class _AddEditPlaceScreenState extends StateWithBag<AddEditPlaceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).canvasColor,
-      child: Stack(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add Place'),
+      ),
+      body: Stack(
         children: <Widget>[
           SafeArea(
             child: ListView(

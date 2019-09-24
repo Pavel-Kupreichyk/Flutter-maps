@@ -1,3 +1,4 @@
+import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/support_classes/navigation_info.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_maps/src/blocs/main_bloc.dart';
@@ -6,12 +7,15 @@ import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:flutter_maps/src/models/place.dart';
 
 class MockFirestoreService extends Mock implements FirestoreService {}
+class MockAuthService extends Mock implements AuthService {}
 
 void main() {
   final MockFirestoreService firestoreService = MockFirestoreService();
+  final MockAuthService authService = MockAuthService();
 
   setUp(() {
     reset(firestoreService);
+    reset(authService);
   });
 
   test('emits list of current places after init', () {
@@ -24,7 +28,7 @@ void main() {
     when(firestoreService.fetchPlaces()).thenAnswer((_) =>
         Future<List<Place>>.delayed(
             Duration(milliseconds: 50), () => listOfPlaces));
-    final bloc = MainBloc(firestoreService);
+    final bloc = MainBloc(firestoreService, authService);
 
     expect(bloc.places, emits(listOfPlaces));
   });
@@ -35,7 +39,7 @@ void main() {
       Place('Place2', null, 'Place2', 2, 2)
     ];
 
-    final bloc = MainBloc(firestoreService);
+    final bloc = MainBloc(firestoreService, authService);
     expect(bloc.places, emitsInOrder([null, listOfPlaces]));
 
     when(firestoreService.fetchPlaces()).thenAnswer((_) =>
@@ -45,7 +49,7 @@ void main() {
   });
 
   test('emits NavigationInfo after addButtonPressed called', () {
-    final bloc = MainBloc(firestoreService);
+    final bloc = MainBloc(firestoreService, authService);
     expect(bloc.navigation, emits(isInstanceOf<NavigationInfo>()));
 
     bloc.addButtonPressed();

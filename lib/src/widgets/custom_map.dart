@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:cached_network_image/cached_network_image.dart';
@@ -64,7 +65,12 @@ class _CustomMapState extends StateWithBag<CustomMap> {
   }
 
   _loadImageAndCreateMarker(Place place) async {
-    var provider = CachedNetworkImageProvider(place.imageUrl);
+    ImageProvider provider;
+    if (place.imageUrl != null) {
+      provider = CachedNetworkImageProvider(place.imageUrl);
+    } else {
+      provider = AssetImage('images/placeholder.png');
+    }
     var load = provider.load(await provider.obtainKey(ImageConfiguration()));
     var listener =
         ImageStreamListener((info, _) => _addMarkerToList(place, info.image));
@@ -92,6 +98,7 @@ class _CustomMapState extends StateWithBag<CustomMap> {
     final int width = (height * 0.7).toInt();
     final pointerRadius = height / 14;
     final center = Offset(width / 2, height - pointerRadius);
+    double imgSize = min(image.height, image.width).toDouble();
 
     Paint paintCircle = Paint()..color = Colors.black;
     Paint paintBorder = Paint()
@@ -110,8 +117,8 @@ class _CustomMapState extends StateWithBag<CustomMap> {
         image,
         Rect.fromCenter(
             center: Offset(image.width / 2, image.height / 2),
-            width: 750,
-            height: 750),
+            width: imgSize,
+            height: imgSize),
         Rect.fromLTWH(0, 0, width.toDouble(), height * 0.7),
         Paint());
 

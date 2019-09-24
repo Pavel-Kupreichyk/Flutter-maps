@@ -2,10 +2,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/auth_bloc.dart';
 import 'package:flutter_maps/src/managers/alert_presenter.dart';
+import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/support_classes/state_with_bag.dart';
-import 'package:flutter_maps/src/widgets/animated_bottom_menu.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+
+import 'package:provider/provider.dart';
+
+class AuthScreenBuilder extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ProxyProvider<AuthService, AuthBloc>(
+        builder: (_, auth, __) => AuthBloc(auth),
+        dispose: (_, bloc) => bloc.dispose(),
+        child: Consumer2<AuthBloc, AlertPresenter>(
+          builder: (_, bloc, alert, __) => AuthScreen(bloc, alert),
+        ));
+  }
+}
 
 class AuthScreen extends StatefulWidget {
   static const route = '/auth';
@@ -24,31 +36,33 @@ class _AuthScreenState extends StateWithBag<AuthScreen> {
   String _password = '';
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).canvasColor,
-      padding: EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: ListView(
-          children: <Widget>[
-            _showEmailInput(),
-            _showPasswordInput(),
-            _showPrimaryButton(),
-            _showSecondaryButton(),
-            _showErrorMessage(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
   void setupBindings() {
     bag += widget.bloc.success.listen((_) {
       widget.alertPresenter.showStandardSnackBar(context, 'You logged in');
       Navigator.pop(context);
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Authentication'),),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: <Widget>[
+              _showEmailInput(),
+              _showPasswordInput(),
+              _showPrimaryButton(),
+              _showSecondaryButton(),
+              _showErrorMessage(),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _showEmailInput() {
