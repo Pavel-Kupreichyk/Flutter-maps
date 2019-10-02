@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/place_screen_bloc.dart';
-import 'package:flutter_maps/src/managers/navigation_manager.dart';
-import 'package:flutter_maps/src/managers/snack_bar_manager.dart';
 import 'package:flutter_maps/src/support_classes/alert_presenter.dart';
 import 'package:flutter_maps/src/managers/upload_manager.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
@@ -14,17 +12,16 @@ import 'dart:io';
 import 'package:provider/provider.dart';
 
 class PlaceScreenBuilder extends StatelessWidget {
-  static const route = '/addEditPlaceScreen';
   final Object _arg;
 
   PlaceScreenBuilder(this._arg);
 
   @override
   Widget build(BuildContext context) {
-    return ProxyProvider5<FirestoreService, GeolocationService, UploadManager,
-        NavigationManager, SnackBarManager, AddEditPlaceBloc>(
-      builder: (_, firestore, geo, upload, nav, alert, __) =>
-          AddEditPlaceBloc(firestore, geo, upload, nav, alert, _arg),
+    return ProxyProvider3<FirestoreService, GeolocationService, UploadManager,
+        AddEditPlaceBloc>(
+      builder: (_, firestore, geo, upload, __) =>
+          AddEditPlaceBloc(firestore, geo, upload, _arg),
       dispose: (_, bloc) => bloc.dispose(),
       child: Consumer<AddEditPlaceBloc>(
         builder: (_, bloc, __) => Scaffold(
@@ -63,6 +60,8 @@ class _AddEditPlaceScreenState extends StateWithBag<AddEditPlaceScreen> {
           break;
       }
     });
+    bag +=
+        widget.bloc.popWithMessage.listen((msg) => Navigator.pop(context, msg));
   }
 
   @override

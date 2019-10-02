@@ -1,6 +1,3 @@
-import 'package:flutter_maps/src/managers/navigation_manager.dart';
-import 'package:flutter_maps/src/managers/snack_bar_manager.dart';
-import 'package:flutter_maps/src/screens/screen_types.dart';
 import 'package:flutter_maps/src/services/geolocation_service.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:location/location.dart';
@@ -23,17 +20,16 @@ class AddEditPlaceBloc implements Disposable {
   final FirestoreService _firestoreService;
   final GeolocationService _geolocationService;
   final UploadManager _uploadManager;
-  final NavigationManager _navigationManager;
-  final SnackBarManager _snackBarManager;
 
   BehaviorSubject<Place> _place;
   BehaviorSubject<File> _image = BehaviorSubject();
   BehaviorSubject<bool> _bottomMenuState = BehaviorSubject.seeded(false);
   BehaviorSubject<bool> _isLoading = BehaviorSubject.seeded(false);
   PublishSubject<AddEditPlaceBlocError> _error = PublishSubject();
+  PublishSubject<String> _popWithMessage = PublishSubject();
 
-  AddEditPlaceBloc(this._firestoreService, this._geolocationService,
-      this._uploadManager, this._navigationManager, this._snackBarManager,
+  AddEditPlaceBloc(
+      this._firestoreService, this._geolocationService, this._uploadManager,
       [Place place]) {
     _place = BehaviorSubject.seeded(place);
   }
@@ -45,6 +41,7 @@ class AddEditPlaceBloc implements Disposable {
   Observable<bool> get bottomMenuState => _bottomMenuState;
   Observable<bool> get isLoading => _isLoading;
   Observable<File> get image => _image;
+  Observable<String> get popWithMessage => _popWithMessage;
 
   //Input functions
 
@@ -55,17 +52,14 @@ class AddEditPlaceBloc implements Disposable {
     if (location != null) {
       var loadingTask = await _firestoreService.addNewPlace(
           name, about, _image.value, location.latitude, location.longitude);
-
       if (loadingTask == null) {
-        _snackBarManager.pushSnackBar(
-            ScreenType.main, 'Place added successfully');
+        _popWithMessage.add('Place added successfully');
       } else {
-        _snackBarManager.pushSnackBar(ScreenType.main,
-            'Place added successfully, but image is still uploading');
         _uploadManager.addFirebaseUpload(loadingTask, '${name}_image');
+        _popWithMessage
+            .add('Place added successfully, but image is still uploading');
       }
     }
-    _navigationManager.popCurrent();
     _isLoading.sink.add(false);
   }
 

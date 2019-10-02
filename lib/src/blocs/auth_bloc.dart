@@ -1,7 +1,4 @@
 import 'dart:io';
-import 'package:flutter_maps/src/managers/snack_bar_manager.dart';
-import 'package:flutter_maps/src/managers/navigation_manager.dart';
-import 'package:flutter_maps/src/screens/screen_types.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:flutter_maps/src/support_classes/disposable.dart';
@@ -10,17 +7,17 @@ enum FormMode { login, signup }
 
 class AuthBloc implements Disposable {
   final AuthService _authService;
-  final SnackBarManager _alertManager;
-  final NavigationManager _navigationManager;
 
   BehaviorSubject<FormMode> _formMode = BehaviorSubject.seeded(FormMode.login);
   BehaviorSubject<String> _error = BehaviorSubject();
+  PublishSubject<String> _popWithMessage = PublishSubject();
 
-  AuthBloc(this._authService, this._navigationManager, this._alertManager);
+  AuthBloc(this._authService);
 
   //Outputs
   Observable<FormMode> get formMode => _formMode;
   Observable<String> get error => _error;
+  Observable<String> get popWithMessage => _popWithMessage;
 
   //Input functions
   changeMode() {
@@ -38,8 +35,7 @@ class AuthBloc implements Disposable {
       } else {
         await _authService.signUp(email, password);
       }
-      _alertManager.pushSnackBar(ScreenType.main, 'You logged in');
-      _navigationManager.popCurrent();
+      _popWithMessage.add('You logged in');
     }
     catch(error) {
       if(Platform.isIOS) {
@@ -53,6 +49,7 @@ class AuthBloc implements Disposable {
   @override
   void dispose() {
     _formMode.close();
+    _popWithMessage.close();
     _error.close();
   }
 }

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/main_bloc.dart';
-import 'package:flutter_maps/src/managers/snack_bar_manager.dart';
-import 'package:flutter_maps/src/managers/navigation_manager.dart';
 import 'package:flutter_maps/src/models/place.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
@@ -14,14 +12,10 @@ import 'package:flutter_maps/src/widgets/custom_map.dart';
 import 'package:flutter_maps/src/widgets/custom_drawer.dart';
 
 class MainScreenBuilder extends StatelessWidget {
-  static const route = '/';
-
   @override
   Widget build(BuildContext context) {
-    return ProxyProvider4<FirestoreService, AuthService, NavigationManager,
-        SnackBarManager, MainBloc>(
-      builder: (_, firestore, auth, nav, alert, __) =>
-          MainBloc(firestore, auth, nav, alert),
+    return ProxyProvider2<FirestoreService, AuthService, MainBloc>(
+      builder: (_, firestore, auth, __) => MainBloc(firestore, auth),
       dispose: (_, bloc) => bloc.dispose(),
       child: Consumer<MainBloc>(
         builder: (_, bloc, __) => Scaffold(
@@ -52,11 +46,15 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends StateWithBag<MainScreen> {
-
   @override
   void setupBindings() {
-    bag += widget.bloc.showSnackBar.listen((data) =>
-      AlertPresenter.showStandardSnackBar(context, data));
+    bag += widget.bloc.navigate.listen((navInfo) async {
+      var res = await Navigator.pushNamed(context, navInfo.getRoute(),
+          arguments: navInfo.args);
+      if (res != null) {
+        AlertPresenter.showStandardSnackBar(context, res);
+      }
+    });
   }
 
   @override

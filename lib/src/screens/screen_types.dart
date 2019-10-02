@@ -1,1 +1,0 @@
-enum ScreenType { main, place, auth }

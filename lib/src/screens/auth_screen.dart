@@ -1,19 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/auth_bloc.dart';
-import 'package:flutter_maps/src/managers/snack_bar_manager.dart';
-import 'package:flutter_maps/src/managers/navigation_manager.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
+import 'package:flutter_maps/src/support_classes/state_with_bag.dart';
 
 import 'package:provider/provider.dart';
 
 class AuthScreenBuilder extends StatelessWidget {
-  static const route = '/auth';
   @override
   Widget build(BuildContext context) {
-    return ProxyProvider3<AuthService, NavigationManager, SnackBarManager,
-        AuthBloc>(
-      builder: (_, auth, nav, alert, __) => AuthBloc(auth, nav, alert),
+    return ProxyProvider<AuthService, AuthBloc>(
+      builder: (_, auth, __) => AuthBloc(auth),
       dispose: (_, bloc) => bloc.dispose(),
       child: Consumer<AuthBloc>(
         builder: (_, bloc, __) => Scaffold(
@@ -36,10 +33,16 @@ class AuthScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends State<AuthScreen> {
+class _AuthScreenState extends StateWithBag<AuthScreen> {
   final _formKey = new GlobalKey<FormState>();
   String _email = '';
   String _password = '';
+
+  @override
+  void setupBindings() {
+    bag +=
+        widget.bloc.popWithMessage.listen((msg) => Navigator.pop(context, msg));
+  }
 
   @override
   Widget build(BuildContext context) {

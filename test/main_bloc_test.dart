@@ -1,5 +1,5 @@
+import 'package:flutter_maps/src/screens/navigation_info.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
-import 'package:flutter_maps/src/support_classes/navigation_info.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_maps/src/blocs/main_bloc.dart';
 import 'package:mockito/mockito.dart';
@@ -50,7 +50,7 @@ void main() {
 
   test('emits NavigationInfo after addButtonPressed called', () {
     final bloc = MainBloc(firestoreService, authService);
-    expect(bloc.navigation, emits(isInstanceOf<NavigationInfo>()));
+    expect(bloc.navigate, emits(isInstanceOf<NavigationInfo>()));
 
     bloc.addButtonPressed();
   });
