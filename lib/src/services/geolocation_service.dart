@@ -38,7 +38,6 @@ class GeolocationService {
     try {
       return await _location.getLocation();
     } catch (error) {
-      print(error);
       throw GeoServiceException(GeoServiceError.unexpectedError);
     }
   }

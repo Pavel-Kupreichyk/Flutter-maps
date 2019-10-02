@@ -1,65 +1,60 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/auth_bloc.dart';
-import 'package:flutter_maps/src/managers/alert_presenter.dart';
+import 'package:flutter_maps/src/managers/snack_bar_manager.dart';
+import 'package:flutter_maps/src/managers/navigation_manager.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
-import 'package:flutter_maps/src/support_classes/state_with_bag.dart';
 
 import 'package:provider/provider.dart';
 
 class AuthScreenBuilder extends StatelessWidget {
+  static const route = '/auth';
   @override
   Widget build(BuildContext context) {
-    return ProxyProvider<AuthService, AuthBloc>(
-        builder: (_, auth, __) => AuthBloc(auth),
-        dispose: (_, bloc) => bloc.dispose(),
-        child: Consumer2<AuthBloc, AlertPresenter>(
-          builder: (_, bloc, alert, __) => AuthScreen(bloc, alert),
-        ));
+    return ProxyProvider3<AuthService, NavigationManager, SnackBarManager,
+        AuthBloc>(
+      builder: (_, auth, nav, alert, __) => AuthBloc(auth, nav, alert),
+      dispose: (_, bloc) => bloc.dispose(),
+      child: Consumer<AuthBloc>(
+        builder: (_, bloc, __) => Scaffold(
+          appBar: AppBar(
+            title: Text('Authentication'),
+          ),
+          body: AuthScreen(bloc),
+        ),
+      ),
+    );
   }
 }
 
 class AuthScreen extends StatefulWidget {
-  static const route = '/auth';
   final AuthBloc bloc;
-  final AlertPresenter alertPresenter;
 
-  AuthScreen(this.bloc, this.alertPresenter);
+  AuthScreen(this.bloc);
 
   @override
   State<StatefulWidget> createState() => _AuthScreenState();
 }
 
-class _AuthScreenState extends StateWithBag<AuthScreen> {
+class _AuthScreenState extends State<AuthScreen> {
   final _formKey = new GlobalKey<FormState>();
   String _email = '';
   String _password = '';
 
   @override
-  void setupBindings() {
-    bag += widget.bloc.success.listen((_) {
-      widget.alertPresenter.showStandardSnackBar(context, 'You logged in');
-      Navigator.pop(context);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Authentication'),),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: <Widget>[
-              _showEmailInput(),
-              _showPasswordInput(),
-              _showPrimaryButton(),
-              _showSecondaryButton(),
-              _showErrorMessage(),
-            ],
-          ),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          children: <Widget>[
+            _showEmailInput(),
+            _showPasswordInput(),
+            _showPrimaryButton(),
+            _showSecondaryButton(),
+            _showErrorMessage(),
+          ],
         ),
       ),
     );

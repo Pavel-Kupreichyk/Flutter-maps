@@ -1,10 +1,12 @@
+import 'package:flutter_maps/src/managers/navigation_manager.dart';
+import 'package:flutter_maps/src/managers/snack_bar_manager.dart';
+import 'package:flutter_maps/src/screens/screen_types.dart';
 import 'package:flutter_maps/src/services/geolocation_service.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:location/location.dart';
 import 'package:flutter_maps/src/support_classes/disposable.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:flutter_maps/src/models/place.dart';
-import 'package:flutter_maps/src/support_classes/navigation_info.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_maps/src/managers/upload_manager.dart';
 import 'dart:io';
@@ -21,17 +23,17 @@ class AddEditPlaceBloc implements Disposable {
   final FirestoreService _firestoreService;
   final GeolocationService _geolocationService;
   final UploadManager _uploadManager;
+  final NavigationManager _navigationManager;
+  final SnackBarManager _snackBarManager;
 
   BehaviorSubject<Place> _place;
   BehaviorSubject<File> _image = BehaviorSubject();
   BehaviorSubject<bool> _bottomMenuState = BehaviorSubject.seeded(false);
   BehaviorSubject<bool> _isLoading = BehaviorSubject.seeded(false);
-  PublishSubject<NavigationInfo> _navigation = PublishSubject();
   PublishSubject<AddEditPlaceBlocError> _error = PublishSubject();
-  PublishSubject<AddEditPlaceBlocResult> _result = PublishSubject();
 
-  AddEditPlaceBloc(
-      this._firestoreService, this._geolocationService, this._uploadManager,
+  AddEditPlaceBloc(this._firestoreService, this._geolocationService,
+      this._uploadManager, this._navigationManager, this._snackBarManager,
       [Place place]) {
     _place = BehaviorSubject.seeded(place);
   }
@@ -39,9 +41,7 @@ class AddEditPlaceBloc implements Disposable {
   //Outputs
 
   Observable<Place> get place => _place;
-  Observable<NavigationInfo> get navigation => _navigation;
   Observable<AddEditPlaceBlocError> get error => _error;
-  Observable<AddEditPlaceBlocResult> get result => _result;
   Observable<bool> get bottomMenuState => _bottomMenuState;
   Observable<bool> get isLoading => _isLoading;
   Observable<File> get image => _image;
@@ -57,12 +57,15 @@ class AddEditPlaceBloc implements Disposable {
           name, about, _image.value, location.latitude, location.longitude);
 
       if (loadingTask == null) {
-        _result.sink.add(AddEditPlaceBlocResult.PlaceAdded);
+        _snackBarManager.pushSnackBar(
+            ScreenType.main, 'Place added successfully');
       } else {
-        _result.sink.add(AddEditPlaceBlocResult.PlaceAddedAndImageIsLoading);
+        _snackBarManager.pushSnackBar(ScreenType.main,
+            'Place added successfully, but image is still uploading');
         _uploadManager.addFirebaseUpload(loadingTask, '${name}_image');
       }
     }
+    _navigationManager.popCurrent();
     _isLoading.sink.add(false);
   }
 
@@ -76,7 +79,10 @@ class AddEditPlaceBloc implements Disposable {
 
   addImage(ImageSource source) async {
     var image = await ImagePicker.pickImage(
-        source: source, maxWidth: 1000, maxHeight: 1000,);
+      source: source,
+      maxWidth: 1000,
+      maxHeight: 1000,
+    );
     if (image != null) {
       _image.add(image);
     }
@@ -110,11 +116,9 @@ class AddEditPlaceBloc implements Disposable {
   @override
   void dispose() {
     _place.close();
-    _navigation.close();
     _error.close();
     _bottomMenuState.close();
     _image.close();
-    _result.close();
     _isLoading.close();
   }
 }

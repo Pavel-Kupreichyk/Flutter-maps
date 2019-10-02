@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter_maps/src/support_classes/disposable.dart';
 
 class DisposeBag implements Disposable{
-  List<StreamSubscription> _bag = [];
+  final List<StreamSubscription> _bag = [];
 
   DisposeBag operator +(StreamSubscription subscription) {
     _bag.add(subscription);
@@ -14,6 +14,6 @@ class DisposeBag implements Disposable{
     _bag.forEach((subscription) {
       subscription.cancel();
     });
-    _bag = [];
+    _bag.clear();
   }
 }

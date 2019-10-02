@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/place_screen_bloc.dart';
-import 'package:flutter_maps/src/managers/alert_presenter.dart';
+import 'package:flutter_maps/src/managers/navigation_manager.dart';
+import 'package:flutter_maps/src/managers/snack_bar_manager.dart';
+import 'package:flutter_maps/src/support_classes/alert_presenter.dart';
 import 'package:flutter_maps/src/managers/upload_manager.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:flutter_maps/src/services/geolocation_service.dart';
@@ -12,29 +14,34 @@ import 'dart:io';
 import 'package:provider/provider.dart';
 
 class PlaceScreenBuilder extends StatelessWidget {
+  static const route = '/addEditPlaceScreen';
   final Object _arg;
 
   PlaceScreenBuilder(this._arg);
 
   @override
   Widget build(BuildContext context) {
-    return ProxyProvider3<FirestoreService, GeolocationService, UploadManager,
-            AddEditPlaceBloc>(
-        builder: (_, firestore, geo, upload, __) =>
-            AddEditPlaceBloc(firestore, geo, upload, _arg),
-        dispose: (_, bloc) => bloc.dispose(),
-        child: Consumer2<AddEditPlaceBloc, AlertPresenter>(
-          builder: (_, bloc, alert, __) => AddEditPlaceScreen(bloc, alert),
-        ));
+    return ProxyProvider5<FirestoreService, GeolocationService, UploadManager,
+        NavigationManager, SnackBarManager, AddEditPlaceBloc>(
+      builder: (_, firestore, geo, upload, nav, alert, __) =>
+          AddEditPlaceBloc(firestore, geo, upload, nav, alert, _arg),
+      dispose: (_, bloc) => bloc.dispose(),
+      child: Consumer<AddEditPlaceBloc>(
+        builder: (_, bloc, __) => Scaffold(
+          appBar: AppBar(
+            title: Text('Add Place'),
+          ),
+          body: AddEditPlaceScreen(bloc),
+        ),
+      ),
+    );
   }
 }
 
 class AddEditPlaceScreen extends StatefulWidget {
-  static const route = '/addEditPlaceScreen';
   final AddEditPlaceBloc bloc;
-  final AlertPresenter alertPresenter;
 
-  AddEditPlaceScreen(this.bloc, this.alertPresenter);
+  AddEditPlaceScreen(this.bloc);
 
   @override
   State<StatefulWidget> createState() => _AddEditPlaceScreenState();
@@ -43,93 +50,69 @@ class AddEditPlaceScreen extends StatefulWidget {
 class _AddEditPlaceScreenState extends StateWithBag<AddEditPlaceScreen> {
   @override
   void setupBindings() {
-    bag += widget.bloc.navigation.listen((navInfo) {
-      Navigator.pushNamed(context, navInfo.route, arguments: navInfo.args);
-    });
-
     bag += widget.bloc.error.listen((error) {
       switch (error) {
         case AddEditPlaceBlocError.permissionNotProvided:
           _requestPermission();
           break;
         case AddEditPlaceBlocError.servicesDisabled:
-          widget.alertPresenter.showDisabledDialog(context);
+          AlertPresenter.showDisabledDialog(context);
           break;
         case AddEditPlaceBlocError.unexpectedError:
-          widget.alertPresenter.showErrorDialog(context);
+          AlertPresenter.showErrorDialog(context);
           break;
       }
-    });
-
-    bag += widget.bloc.result.listen((result) {
-      switch (result) {
-        case AddEditPlaceBlocResult.PlaceAdded:
-          widget.alertPresenter
-              .showStandardSnackBar(context, 'Place added successfully');
-          break;
-        case AddEditPlaceBlocResult.PlaceAddedAndImageIsLoading:
-          widget.alertPresenter.showStandardSnackBar(context,
-              'Place added successfully, but image is still uploading');
-          break;
-      }
-
-      Navigator.pop(context);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Place'),
-      ),
-      body: Stack(
-        children: <Widget>[
-          SafeArea(
-            child: ListView(
-              children: <Widget>[
-                Center(
-                  child: StreamBuilder<File>(
-                    stream: widget.bloc.image,
-                    builder: (_, snapshot) {
-                      return _buildImageView(snapshot.data);
-                    },
-                  ),
+    return Stack(
+      children: <Widget>[
+        SafeArea(
+          child: ListView(
+            children: <Widget>[
+              Center(
+                child: StreamBuilder<File>(
+                  stream: widget.bloc.image,
+                  builder: (_, snapshot) {
+                    return _buildImageView(snapshot.data);
+                  },
                 ),
-                Center(
-                  child: _PlaceTextForm(widget.bloc),
-                ),
-              ],
-            ),
+              ),
+              Center(
+                child: _PlaceTextForm(widget.bloc),
+              ),
+            ],
           ),
-          StreamBuilder<bool>(
-            stream: widget.bloc.bottomMenuState,
-            builder: (_, snapshot) {
-              return AnimatedBottomMenu(
-                isOpen: snapshot.data ?? false,
-                onButtonPressed: (type) {
-                  switch (type) {
-                    case ButtonType.camera:
-                      widget.bloc.addImage(ImageSource.camera);
-                      break;
-                    case ButtonType.gallery:
-                      widget.bloc.addImage(ImageSource.gallery);
-                      break;
-                    case ButtonType.remove:
-                      widget.bloc.removeImage();
-                      break;
-                  }
-                },
-              );
-            },
-          ),
-        ],
-      ),
+        ),
+        StreamBuilder<bool>(
+          stream: widget.bloc.bottomMenuState,
+          builder: (_, snapshot) {
+            return AnimatedBottomMenu(
+              isOpen: snapshot.data ?? false,
+              onButtonPressed: (type) {
+                switch (type) {
+                  case ButtonType.camera:
+                    widget.bloc.addImage(ImageSource.camera);
+                    break;
+                  case ButtonType.gallery:
+                    widget.bloc.addImage(ImageSource.gallery);
+                    break;
+                  case ButtonType.remove:
+                    widget.bloc.removeImage();
+                    break;
+                }
+              },
+            );
+          },
+        ),
+      ],
     );
   }
 
   _requestPermission() async {
-    await widget.alertPresenter.showPermissionDialog(context);
+    AlertPresenter.showPermissionDialog(context);
     widget.bloc.requestLocationPermission();
   }
 
