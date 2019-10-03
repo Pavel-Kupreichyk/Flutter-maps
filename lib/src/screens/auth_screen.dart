@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/auth_bloc.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
+import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:flutter_maps/src/support_classes/state_with_bag.dart';
 
 import 'package:provider/provider.dart';
@@ -9,8 +10,8 @@ import 'package:provider/provider.dart';
 class AuthScreenBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ProxyProvider<AuthService, AuthBloc>(
-      builder: (_, auth, __) => AuthBloc(auth),
+    return ProxyProvider2<AuthService, FirestoreService, AuthBloc>(
+      builder: (_, auth, store, __) => AuthBloc(auth, store),
       dispose: (_, bloc) => bloc.dispose(),
       child: Consumer<AuthBloc>(
         builder: (_, bloc, __) => Scaffold(
@@ -37,6 +38,7 @@ class _AuthScreenState extends StateWithBag<AuthScreen> {
   final _formKey = new GlobalKey<FormState>();
   String _email = '';
   String _password = '';
+  String _username = '';
 
   @override
   void setupBindings() {
@@ -54,6 +56,15 @@ class _AuthScreenState extends StateWithBag<AuthScreen> {
           children: <Widget>[
             _showEmailInput(),
             _showPasswordInput(),
+            StreamBuilder<FormMode>(
+              stream: widget.bloc.formMode,
+              builder: (_, snapshot) {
+                if (snapshot.hasData && snapshot.data == FormMode.signup) {
+                  return _showUsernameInput();
+                }
+                return Container();
+              },
+            ),
             _showPrimaryButton(),
             _showSecondaryButton(),
             _showErrorMessage(),
@@ -78,6 +89,24 @@ class _AuthScreenState extends StateWithBag<AuthScreen> {
             )),
         validator: (value) => value.isEmpty ? 'Email can\'t be empty' : null,
         onSaved: (value) => _email = value.trim(),
+      ),
+    );
+  }
+
+  Widget _showUsernameInput() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+      child: TextFormField(
+        maxLines: 1,
+        autofocus: false,
+        decoration: const InputDecoration(
+            hintText: 'Username',
+            icon: const Icon(
+              Icons.person,
+              color: Colors.grey,
+            )),
+        validator: (value) => value.isEmpty ? 'Username can\'t be empty' : null,
+        onSaved: (value) => _username = value.trim(),
       ),
     );
   }
@@ -151,10 +180,10 @@ class _AuthScreenState extends StateWithBag<AuthScreen> {
           return Text(
             snapshot.data,
             style: TextStyle(
-                fontSize: 13.0,
+                fontSize: 14,
                 color: Colors.red,
                 height: 1.0,
-                fontWeight: FontWeight.w300),
+                fontWeight: FontWeight.w500),
           );
         }
         return Container();
@@ -166,7 +195,7 @@ class _AuthScreenState extends StateWithBag<AuthScreen> {
     final form = _formKey.currentState;
     if (form.validate()) {
       form.save();
-      widget.bloc.submit(_email, _password);
+      widget.bloc.submit(_email, _password, _username);
     }
   }
 }

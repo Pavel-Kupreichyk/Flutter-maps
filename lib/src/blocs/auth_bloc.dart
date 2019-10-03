@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter_maps/src/services/auth_service.dart';
+import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:flutter_maps/src/support_classes/disposable.dart';
 
@@ -7,18 +8,19 @@ enum FormMode { login, signup }
 
 class AuthBloc implements Disposable {
   final AuthService _authService;
+  final FirestoreService _firestoreService;
 
   BehaviorSubject<FormMode> _formMode = BehaviorSubject.seeded(FormMode.login);
   BehaviorSubject<String> _error = BehaviorSubject();
   PublishSubject<String> _popWithMessage = PublishSubject();
 
-  AuthBloc(this._authService);
+  AuthBloc(this._authService, this._firestoreService);
 
   //Outputs
   Observable<FormMode> get formMode => _formMode;
   Observable<String> get error => _error;
   Observable<String> get popWithMessage => _popWithMessage;
-
+  
   //Input functions
   changeMode() {
     if(_formMode.value == FormMode.login) {
@@ -28,12 +30,18 @@ class AuthBloc implements Disposable {
     }
   }
 
-  submit(String email, String password) async {
+  submit(String email, String password, String username) async {
     try {
       if (_formMode.value == FormMode.login) {
         await _authService.signIn(email, password);
       } else {
-        await _authService.signUp(email, password);
+        if (await _firestoreService.checkUsername(username)) {
+          var id = await _authService.signUp(email, password);
+          await _firestoreService.addNewUser(id, username);
+        } else {
+          _error.sink.add('Username already exists');
+          return;
+        }
       }
       _popWithMessage.add('You logged in');
     }

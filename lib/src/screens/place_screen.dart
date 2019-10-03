@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/place_screen_bloc.dart';
+import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/support_classes/alert_presenter.dart';
 import 'package:flutter_maps/src/managers/upload_manager.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
@@ -18,10 +19,10 @@ class PlaceScreenBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ProxyProvider3<FirestoreService, GeolocationService, UploadManager,
-        AddEditPlaceBloc>(
-      builder: (_, firestore, geo, upload, __) =>
-          AddEditPlaceBloc(firestore, geo, upload, _arg),
+    return ProxyProvider4<FirestoreService, GeolocationService, UploadManager,
+        AuthService, AddEditPlaceBloc>(
+      builder: (_, firestore, geo, upload, auth, __) =>
+          AddEditPlaceBloc(firestore, geo, upload, auth, _arg),
       dispose: (_, bloc) => bloc.dispose(),
       child: Consumer<AddEditPlaceBloc>(
         builder: (_, bloc, __) => Scaffold(
@@ -54,6 +55,9 @@ class _AddEditPlaceScreenState extends StateWithBag<AddEditPlaceScreen> {
           break;
         case AddEditPlaceBlocError.servicesDisabled:
           AlertPresenter.showDisabledDialog(context);
+          break;
+        case AddEditPlaceBlocError.notLoggedIn:
+          AlertPresenter.showNotLoggedInDialog(context);
           break;
         case AddEditPlaceBlocError.unexpectedError:
           AlertPresenter.showErrorDialog(context);

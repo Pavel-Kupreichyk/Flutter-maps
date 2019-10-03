@@ -1,3 +1,4 @@
+import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/services/geolocation_service.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:location/location.dart';
@@ -11,6 +12,7 @@ import 'dart:io';
 enum AddEditPlaceBlocError {
   permissionNotProvided,
   servicesDisabled,
+  notLoggedIn,
   unexpectedError
 }
 
@@ -20,6 +22,7 @@ class AddEditPlaceBloc implements Disposable {
   final FirestoreService _firestoreService;
   final GeolocationService _geolocationService;
   final UploadManager _uploadManager;
+  final AuthService _authService;
 
   BehaviorSubject<Place> _place;
   BehaviorSubject<File> _image = BehaviorSubject();
@@ -28,8 +31,8 @@ class AddEditPlaceBloc implements Disposable {
   PublishSubject<AddEditPlaceBlocError> _error = PublishSubject();
   PublishSubject<String> _popWithMessage = PublishSubject();
 
-  AddEditPlaceBloc(
-      this._firestoreService, this._geolocationService, this._uploadManager,
+  AddEditPlaceBloc(this._firestoreService, this._geolocationService,
+      this._uploadManager, this._authService,
       [Place place]) {
     _place = BehaviorSubject.seeded(place);
   }
@@ -47,10 +50,11 @@ class AddEditPlaceBloc implements Disposable {
 
   addPlace(String name, String about) async {
     _isLoading.sink.add(true);
-    LocationData location = await _getLocationOrEmitError();
+    final user = await _getUserOrEmitError();
+    final location = await _getLocationOrEmitError();
 
-    if (location != null) {
-      var loadingTask = await _firestoreService.addNewPlace(
+    if (location != null && user != null) {
+      var loadingTask = await _firestoreService.addNewPlace(user,
           name, about, _image.value, location.latitude, location.longitude);
       if (loadingTask == null) {
         _popWithMessage.add('Place added successfully');
@@ -105,6 +109,15 @@ class AddEditPlaceBloc implements Disposable {
       }
     }
     return null;
+  }
+
+  Future<String> _getUserOrEmitError() async {
+    final user = await _authService.getCurrentUser();
+    if(user == null) {
+      _error.sink.add(AddEditPlaceBlocError.notLoggedIn);
+      _popWithMessage.add(null);
+    }
+    return user;
   }
 
   @override

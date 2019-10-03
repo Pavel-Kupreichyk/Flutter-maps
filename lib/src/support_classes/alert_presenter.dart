@@ -13,6 +13,10 @@ class AlertPresenter {
       showCustomDialog(context, 'Enable geolocation services',
           'To use this functionality of the app, you need to enable geolocation services.');
 
+  static Future<ConfirmAction> showNotLoggedInDialog(BuildContext context) =>
+      showCustomDialog(context, 'You are not logged in',
+          'You must to log in to use this functionality of app.');
+
   static Future<ConfirmAction> showErrorDialog(BuildContext context) =>
       showCustomDialog(
           context, 'Error', 'Unexpected error occurred. Please try again.');

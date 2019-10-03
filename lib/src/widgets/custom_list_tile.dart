@@ -29,7 +29,7 @@ class CustomListTile extends StatelessWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20.0, 2.0, 2.0, 0.0),
+                  padding: const EdgeInsets.fromLTRB(12.0, 2.0, 2.0, 0.0),
                   child: _buildInfoWidget(_place),
                 ),
               )
@@ -53,7 +53,7 @@ class CustomListTile extends StatelessWidget {
     return CachedNetworkImage(
       placeholder: (context, url) => Container(
           child: const Center(child: CircularProgressIndicator()), width: 100),
-      imageUrl: imageUrl,//'https://image.tmdb.org/t/p/original/kqjL17yufvn9OVLyXYpvtyrFfak.jpg', //<- For tests
+      imageUrl: imageUrl,
       fit: BoxFit.cover,
     );
   }
@@ -73,6 +73,7 @@ class CustomListTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
+                  fontSize: 15,
                 ),
               ),
               const Padding(padding: EdgeInsets.only(bottom: 2.0)),
@@ -81,7 +82,7 @@ class CustomListTile extends StatelessWidget {
                 maxLines: 4,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 12.0,
+                  fontSize: 13.0,
                   color: Colors.white54,
                 ),
               ),
@@ -94,8 +95,8 @@ class CustomListTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              const Text(
-                ' · ★',
+              Text(
+                '★ ${place.userName ?? ''}',
                 style: TextStyle(
                   fontSize: 12.0,
                   color: Colors.white54,

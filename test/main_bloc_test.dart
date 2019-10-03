@@ -7,6 +7,7 @@ import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:flutter_maps/src/models/place.dart';
 
 class MockFirestoreService extends Mock implements FirestoreService {}
+
 class MockAuthService extends Mock implements AuthService {}
 
 void main() {
@@ -20,9 +21,9 @@ void main() {
 
   test('emits list of current places after init', () {
     final listOfPlaces = [
-      Place('Place1', null, 'Place1', 1, 1),
-      Place('Place2', null, 'Place2', 2, 2),
-      Place('Place3', null, 'Place3', 3, 3)
+      Place('Place1', '12345', 'Name1', null, 'Place1', 1, 1),
+      Place('Place2', '9226', 'Name2', null, 'Place2', 2, 2),
+      Place('Place3', '57345', 'Name3', null, 'Place3', 3, 3)
     ];
 
     when(firestoreService.fetchPlaces()).thenAnswer((_) =>
@@ -35,8 +36,8 @@ void main() {
 
   test('emits list of current places after refreshPlaces called', () {
     final listOfPlaces = [
-      Place('Place1', null, 'Place1', 1, 1),
-      Place('Place2', null, 'Place2', 2, 2)
+      Place('Place1', '12345', 'Name1', null, 'Place1', 1, 1),
+      Place('Place2', '9226', 'Name2', null, 'Place2', 2, 2)
     ];
 
     final bloc = MainBloc(firestoreService, authService);
