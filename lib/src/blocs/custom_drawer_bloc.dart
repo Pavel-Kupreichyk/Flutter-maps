@@ -1,5 +1,6 @@
 import 'package:flutter_maps/src/managers/upload_manager.dart';
 import 'package:flutter_maps/src/models/upload_snapshot.dart';
+import 'package:flutter_maps/src/screens/navigation_info.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/support_classes/disposable.dart';
 import 'package:rxdart/rxdart.dart';
@@ -10,6 +11,7 @@ class CustomDrawerBloc implements Disposable {
 
   BehaviorSubject<bool> _isUserLoggedIn = BehaviorSubject();
   PublishSubject<void> _userLoggedOut = PublishSubject();
+  PublishSubject<NavigationInfo> _navigate = PublishSubject();
 
   CustomDrawerBloc(this._uploadManager, this._authService) {
     _getUser();
@@ -18,9 +20,14 @@ class CustomDrawerBloc implements Disposable {
   Observable<List<UploadSnapshot>> get snapshots => _uploadManager.snapshots;
   Observable<bool> get isUserLoggedIn => _isUserLoggedIn;
   Observable<void> get userLoggedOut => _userLoggedOut;
+  Observable<NavigationInfo> get navigate => _navigate;
 
   removeUpload(String name) {
     _uploadManager.removeUpload(name);
+  }
+
+  moveToSettings() {
+    _navigate.add(NavigationInfo(ScreenType.settings));
   }
 
   logOut() async {
@@ -31,7 +38,7 @@ class CustomDrawerBloc implements Disposable {
 
   _getUser() async {
     var user = await _authService.getCurrentUser();
-    if(user == null) {
+    if (user == null) {
       _isUserLoggedIn.sink.add(false);
     } else {
       _isUserLoggedIn.sink.add(true);
@@ -42,5 +49,6 @@ class CustomDrawerBloc implements Disposable {
   void dispose() {
     _isUserLoggedIn.close();
     _userLoggedOut.close();
+    _navigate.close();
   }
 }

@@ -21,6 +21,7 @@ class AnimatedBottomMenuState extends State<AnimatedBottomMenu>
   static const double blurRadius = 20;
   AnimationController _controller;
   Animation<double> _animation;
+  ThemeData theme;
 
   @override
   void initState() {
@@ -31,6 +32,12 @@ class AnimatedBottomMenuState extends State<AnimatedBottomMenu>
         .animate(_controller)
           ..addListener(() => setState(() {}));
     _animateMenu();
+  }
+
+  @override
+  void didChangeDependencies() {
+    theme = Theme.of(context);
+    super.didChangeDependencies();
   }
 
   @override
@@ -59,17 +66,17 @@ class AnimatedBottomMenuState extends State<AnimatedBottomMenu>
           height: menuHeight,
           decoration: BoxDecoration(
             boxShadow: [
-              const BoxShadow(
-                color: Colors.blueGrey,
+              BoxShadow(
+                color: theme.accentColor,
                 blurRadius: blurRadius,
-                spreadRadius: 4.0,
+                spreadRadius: 1.0,
                 offset: Offset(
                   8.0,
                   8.0,
                 ),
               )
             ],
-            color: Colors.black54,
+            color: theme.bottomAppBarColor,
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),

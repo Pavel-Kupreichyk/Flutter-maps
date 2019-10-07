@@ -38,6 +38,11 @@ class _CustomDrawerState extends StateWithBag<CustomDrawer> {
       AlertPresenter.showStandardSnackBar(context, 'You logged out');
       Navigator.pop(context);
     });
+
+    bag += widget.bloc.navigate.listen((navInfo) {
+      Navigator.pop(context);
+      Navigator.pushNamed(context, navInfo.getRoute(), arguments: navInfo.args);
+    });
   }
 
   @override
@@ -53,6 +58,7 @@ class _CustomDrawerState extends StateWithBag<CustomDrawer> {
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
               leading: Icon(Icons.settings),
+              onTap: widget.bloc.moveToSettings,
             ),
             StreamBuilder<bool>(
               stream: widget.bloc.isUserLoggedIn,

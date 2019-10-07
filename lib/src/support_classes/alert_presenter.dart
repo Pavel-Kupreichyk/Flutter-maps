@@ -5,7 +5,9 @@ enum ConfirmAction { cancel, accept }
 
 class AlertPresenter {
   static Future<ConfirmAction> showPermissionDialog(BuildContext context) =>
-      showCustomDialog(context, 'Provide access to geolocation services',
+      showCustomDialog(
+          context,
+          'Provide access to geolocation services',
           'To use this functionality of the app, provide access to geolocation services '
               'from the next dialog or from your settings if dialog doesn\'t appear.');
 
@@ -59,9 +61,7 @@ class AlertPresenter {
     var snackBar = SnackBar(
       content: Text(
         text,
-        style: TextStyle(color: Colors.white),
       ),
-      backgroundColor: Colors.black87,
     );
     Scaffold.of(context).showSnackBar(snackBar);
   }

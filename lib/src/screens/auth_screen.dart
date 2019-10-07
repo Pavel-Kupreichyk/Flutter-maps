@@ -65,7 +65,7 @@ class _AuthScreenState extends StateWithBag<AuthScreen> {
                 return Container();
               },
             ),
-            _showPrimaryButton(),
+            _showPrimaryButton(Theme.of(context)),
             _showSecondaryButton(),
             _showErrorMessage(),
           ],
@@ -130,23 +130,25 @@ class _AuthScreenState extends StateWithBag<AuthScreen> {
     );
   }
 
-  Widget _showPrimaryButton() {
+  Widget _showPrimaryButton(ThemeData theme) {
     return Padding(
         padding: const EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0),
         child: MaterialButton(
           elevation: 5.0,
           minWidth: 200.0,
           height: 42.0,
-          color: Colors.blue,
+          color: theme.accentColor,
           child: StreamBuilder<FormMode>(
             stream: widget.bloc.formMode,
             builder: (_, snapshot) {
               if (snapshot.data == FormMode.login) {
-                return const Text('Login',
-                    style: TextStyle(fontSize: 20.0, color: Colors.white));
+                return Text('Login',
+                    style: TextStyle(
+                        fontSize: 20.0,
+                        color: theme.accentTextTheme.title.color));
               } else {
                 return const Text('Create account',
-                    style: TextStyle(fontSize: 20.0, color: Colors.white));
+                    style: TextStyle(fontSize: 20.0));
               }
             },
           ),

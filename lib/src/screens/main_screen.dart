@@ -25,10 +25,8 @@ class MainScreenBuilder extends StatelessWidget {
           drawer: CustomDrawerBuilder(),
           body: MainScreen(bloc),
           floatingActionButton: FloatingActionButton(
-              backgroundColor: Colors.blueGrey,
               child: const Icon(
                 Icons.add,
-                color: Colors.white,
               ),
               onPressed: () => bloc.addButtonPressed()),
         ),

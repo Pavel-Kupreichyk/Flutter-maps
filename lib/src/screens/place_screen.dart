@@ -135,9 +135,7 @@ class _AddEditPlaceScreenState extends StateWithBag<AddEditPlaceScreen> {
           heroTag: 'unique1',
           child: const Icon(
             Icons.add,
-            color: Colors.white,
           ),
-          backgroundColor: Colors.blueGrey,
           shape: RoundedRectangleBorder(
               borderRadius:
                   const BorderRadius.only(bottomRight: Radius.circular(16))),
@@ -177,6 +175,7 @@ class _PlaceTextFormState extends StateWithBag<_PlaceTextForm> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Form(
       key: _formKey,
       child: Padding(
@@ -219,7 +218,7 @@ class _PlaceTextFormState extends StateWithBag<_PlaceTextForm> {
                   return Row(
                     children: <Widget>[
                       RaisedButton(
-                        color: Colors.blueGrey,
+                        color: theme.accentColor,
                         onPressed: isLoading
                             ? null
                             : () {
@@ -228,7 +227,11 @@ class _PlaceTextFormState extends StateWithBag<_PlaceTextForm> {
                                       _aboutController.text);
                                 }
                               },
-                        child: const Text('Submit'),
+                        child: Text(
+                          'Submit',
+                          style: TextStyle(
+                              color: theme.accentTextTheme.title.color),
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 8),

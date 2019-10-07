@@ -30,7 +30,7 @@ class CustomListTile extends StatelessWidget {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(12.0, 2.0, 2.0, 0.0),
-                  child: _buildInfoWidget(_place),
+                  child: _buildInfoWidget(_place, Theme.of(context)),
                 ),
               )
             ],
@@ -58,7 +58,7 @@ class CustomListTile extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoWidget(Place place) {
+  Widget _buildInfoWidget(Place place, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -81,9 +81,9 @@ class CustomListTile extends StatelessWidget {
                 place.about ?? '',
                 maxLines: 4,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13.0,
-                  color: Colors.white54,
+                  color: theme.disabledColor,
                 ),
               ),
             ],
@@ -99,7 +99,7 @@ class CustomListTile extends StatelessWidget {
                 '★ ${place.userName ?? ''}',
                 style: TextStyle(
                   fontSize: 12.0,
-                  color: Colors.white54,
+                  color: theme.disabledColor,
                 ),
               ),
             ],
