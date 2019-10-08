@@ -3,10 +3,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_maps/src/models/place.dart';
 
 class CustomListTile extends StatelessWidget {
-  final Function onItemSelected;
+  final Function() onLocationButtonPressed;
+  final Function() onItemSelected;
   final Place _place;
 
-  CustomListTile(this._place, {this.onItemSelected});
+  CustomListTile(this._place, {this.onLocationButtonPressed, this.onItemSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +33,14 @@ class CustomListTile extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(12.0, 2.0, 2.0, 0.0),
                   child: _buildInfoWidget(_place, Theme.of(context)),
                 ),
+              ),
+              IconButton(
+                icon: Icon(Icons.my_location),
+                onPressed: () {
+                  if (onLocationButtonPressed != null) {
+                    onLocationButtonPressed();
+                  }
+                },
               )
             ],
           ),

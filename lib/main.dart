@@ -2,8 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/managers/style_manager.dart';
 import 'package:flutter_maps/src/screens/auth_screen.dart';
-import 'package:flutter_maps/src/screens/place_screen.dart';
+import 'package:flutter_maps/src/screens/place_add_edit_screen.dart';
 import 'package:flutter_maps/src/screens/navigation_info.dart';
+import 'package:flutter_maps/src/screens/place_info_screen.dart';
 import 'package:flutter_maps/src/screens/settings_screen.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/services/geolocation_service.dart';
@@ -36,7 +37,7 @@ class App extends StatelessWidget {
       child: StreamBuilder<ThemeData>(
         stream: _styleManager.appStyle,
         builder: (_, snapshot) {
-          if(!snapshot.hasData) {
+          if (!snapshot.hasData) {
             return Container();
           }
           return MaterialApp(
@@ -60,6 +61,9 @@ class App extends StatelessWidget {
         break;
       case NavigationInfo.settingsRoute:
         newScreen = SettingsScreenBuilder();
+        break;
+      case NavigationInfo.placeInfo:
+        newScreen = PlaceInfoScreenBuilder();
         break;
       default:
         throw Exception('Invalid route: ${settings.name}');

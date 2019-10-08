@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_maps/src/blocs/place_screen_bloc.dart';
+import 'package:flutter_maps/src/blocs/place_add_edit_bloc.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/support_classes/alert_presenter.dart';
 import 'package:flutter_maps/src/managers/upload_manager.dart';

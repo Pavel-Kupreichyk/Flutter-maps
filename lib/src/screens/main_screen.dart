@@ -106,9 +106,12 @@ class _PlacesList extends StatelessWidget {
                 itemCount: snapshot.data?.length ?? 0,
                 itemBuilder: (_, id) {
                   var place = snapshot.data[id];
-                  return CustomListTile(place,
-                      onItemSelected: () =>
-                          bloc.showLocation(place.lat, place.lng));
+                  return CustomListTile(
+                    place,
+                    onLocationButtonPressed: () =>
+                        bloc.showLocation(place.lat, place.lng),
+                    onItemSelected: () => bloc.itemSelected(place),
+                  );
                 },
               ),
             ),

@@ -1,10 +1,11 @@
-enum ScreenType { main, place, auth, settings }
+enum ScreenType { main, placeAdd, placeInfo, auth, settings }
 
 class NavigationInfo {
   static const mainRoute = '/';
   static const placeRoute = '/addEditPlaceScreen';
   static const authRoute = '/auth';
   static const settingsRoute = '/settings';
+  static const placeInfo = '/placeInfo';
 
   final ScreenType screen;
   final Object args;
@@ -15,10 +16,12 @@ class NavigationInfo {
         return mainRoute;
       case ScreenType.auth:
         return authRoute;
-      case ScreenType.place:
+      case ScreenType.placeAdd:
         return placeRoute;
       case ScreenType.settings:
         return settingsRoute;
+      case ScreenType.placeInfo:
+        return placeInfo;
     }
     return null;
   }

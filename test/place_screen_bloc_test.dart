@@ -1,6 +1,6 @@
 import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_maps/src/blocs/place_screen_bloc.dart';
+import 'package:flutter_maps/src/blocs/place_add_edit_bloc.dart';
 import 'package:location/location.dart';
 import 'package:mockito/mockito.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';

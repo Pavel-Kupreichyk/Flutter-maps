@@ -33,10 +33,14 @@ class MainBloc implements Disposable {
     _location.sink.add(LatLng(lat, lng));
   }
 
+  itemSelected(Place place) {
+    _navigate.add(NavigationInfo(ScreenType.placeInfo));
+  }
+
   addButtonPressed() async {
     var user = await _authService.getCurrentUser();
     if (user != null) {
-      _navigate.add(NavigationInfo(ScreenType.place));
+      _navigate.add(NavigationInfo(ScreenType.placeAdd));
     } else {
       _navigate.add(NavigationInfo(ScreenType.auth));
     }
