@@ -17,6 +17,24 @@ class AuthScreenBuilder extends StatelessWidget {
         builder: (_, bloc, __) => Scaffold(
           appBar: AppBar(
             title: Text('Authentication'),
+            actions: <Widget>[
+              StreamBuilder<bool>(
+                stream: bloc.isLoading,
+                builder: (_, snapshot) {
+                  if (snapshot.hasData && snapshot.data) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 15),
+                      child: Center(
+                          child: SizedBox(
+                              width: 30,
+                              height: 30,
+                              child: CircularProgressIndicator())),
+                    );
+                  }
+                  return Container();
+                },
+              )
+            ],
           ),
           body: AuthScreen(bloc),
         ),
@@ -48,27 +66,29 @@ class _AuthScreenState extends StateWithBag<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: _formKey,
-        child: ListView(
-          children: <Widget>[
-            _showEmailInput(),
-            _showPasswordInput(),
-            StreamBuilder<FormMode>(
-              stream: widget.bloc.formMode,
-              builder: (_, snapshot) {
-                if (snapshot.hasData && snapshot.data == FormMode.signup) {
-                  return _showUsernameInput();
-                }
-                return Container();
-              },
-            ),
-            _showPrimaryButton(Theme.of(context)),
-            _showSecondaryButton(),
-            _showErrorMessage(),
-          ],
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: <Widget>[
+              _showEmailInput(),
+              _showPasswordInput(),
+              StreamBuilder<FormMode>(
+                stream: widget.bloc.formMode,
+                builder: (_, snapshot) {
+                  if (snapshot.hasData && snapshot.data == FormMode.signup) {
+                    return _showUsernameInput();
+                  }
+                  return Container();
+                },
+              ),
+              _showPrimaryButton(Theme.of(context)),
+              _showSecondaryButton(),
+              _showErrorMessage(),
+            ],
+          ),
         ),
       ),
     );
@@ -76,7 +96,7 @@ class _AuthScreenState extends StateWithBag<AuthScreen> {
 
   Widget _showEmailInput() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0.0, 100.0, 0.0, 0.0),
+      padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
       child: TextFormField(
         maxLines: 1,
         keyboardType: TextInputType.emailAddress,
@@ -133,26 +153,32 @@ class _AuthScreenState extends StateWithBag<AuthScreen> {
   Widget _showPrimaryButton(ThemeData theme) {
     return Padding(
         padding: const EdgeInsets.fromLTRB(0.0, 45.0, 0.0, 0.0),
-        child: MaterialButton(
-          elevation: 5.0,
-          minWidth: 200.0,
-          height: 42.0,
-          color: theme.accentColor,
-          child: StreamBuilder<FormMode>(
-            stream: widget.bloc.formMode,
-            builder: (_, snapshot) {
-              if (snapshot.data == FormMode.login) {
-                return Text('Login',
-                    style: TextStyle(
-                        fontSize: 20.0,
-                        color: theme.accentTextTheme.title.color));
-              } else {
-                return const Text('Create account',
-                    style: TextStyle(fontSize: 20.0));
-              }
-            },
-          ),
-          onPressed: _validateAndSubmit,
+        child: StreamBuilder<bool>(
+          stream: widget.bloc.isLoading,
+          builder: (_, snapshot) {
+            final isLoading = snapshot.data ?? false;
+            return RaisedButton(
+              elevation: 3.0,
+              color: theme.accentColor,
+              child: StreamBuilder<FormMode>(
+                stream: widget.bloc.formMode,
+                builder: (_, snapshot) {
+                  if (snapshot.data == FormMode.login) {
+                    return Text('Login',
+                        style: TextStyle(
+                            fontSize: 20.0,
+                            color: theme.accentTextTheme.title.color));
+                  } else {
+                    return Text('Create account',
+                        style: TextStyle(
+                            fontSize: 20.0,
+                            color: theme.accentTextTheme.title.color));
+                  }
+                },
+              ),
+              onPressed: isLoading ? null : _validateAndSubmit,
+            );
+          },
         ));
   }
 

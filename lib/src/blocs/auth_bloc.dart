@@ -12,6 +12,7 @@ class AuthBloc implements Disposable {
 
   BehaviorSubject<FormMode> _formMode = BehaviorSubject.seeded(FormMode.login);
   BehaviorSubject<String> _error = BehaviorSubject();
+  BehaviorSubject<bool> _isLoading = BehaviorSubject.seeded(false);
   PublishSubject<String> _popWithMessage = PublishSubject();
 
   AuthBloc(this._authService, this._firestoreService);
@@ -19,6 +20,7 @@ class AuthBloc implements Disposable {
   //Outputs
   Observable<FormMode> get formMode => _formMode;
   Observable<String> get error => _error;
+  Observable<bool> get isLoading => _isLoading;
   Observable<String> get popWithMessage => _popWithMessage;
   
   //Input functions
@@ -31,6 +33,7 @@ class AuthBloc implements Disposable {
   }
 
   submit(String email, String password, String username) async {
+    _isLoading.add(true);
     try {
       if (_formMode.value == FormMode.login) {
         await _authService.signIn(email, password);
@@ -51,11 +54,14 @@ class AuthBloc implements Disposable {
       } else {
         _error.sink.add(error.details);
       }
+    } finally {
+      _isLoading.add(false);
     }
   }
 
   @override
   void dispose() {
+    _isLoading.close();
     _formMode.close();
     _popWithMessage.close();
     _error.close();

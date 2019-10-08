@@ -56,15 +56,12 @@ class _CustomMapState extends StateWithBag<CustomMap> {
     return StreamBuilder<Set<Marker>>(
       stream: markerCreator.markers,
       builder: (_, snapshot) {
-        if (!snapshot.hasData) {
-          return Container();
-        }
-
+        final Set<Marker> markers = snapshot.hasData ? snapshot.data : {};
         return GoogleMap(
           initialCameraPosition: const CameraPosition(target: blr, zoom: 9),
           myLocationButtonEnabled: false,
           onMapCreated: (controller) => mapController = controller,
-          markers: snapshot.data,
+          markers: markers,
         );
       },
     );
@@ -127,15 +124,18 @@ class MarkerCreator implements Disposable {
 
   _addMarker(Place place, Marker marker) {
     _placeMarker[place].marker = marker;
-    _markersSubject.add(_placeMarker.values.map((v) => v.marker).toSet());
+    _markersSubject.add(_placeMarker.values.map((v) => v.marker)
+        .where((v) => v != null).toSet());
   }
 
   _refreshMarkers(List<Place> places) {
     var toLoad = places.where((p) => !_placeMarker.keys.contains(p));
     var toDelete = _placeMarker.keys.where((p) => !places.contains(p));
-    toDelete.forEach(_removeMarker);
-    _markersSubject.add(_placeMarker.values.map((v) => v.marker).toSet());
-
+    if(toDelete.length > 0) {
+      toDelete.forEach(_removeMarker);
+      _markersSubject.add(_placeMarker.values.map((v) => v.marker)
+          .where((v) => v != null).toSet());
+    }
     toLoad.forEach(_loadImageAndCreateMarker);
   }
 
