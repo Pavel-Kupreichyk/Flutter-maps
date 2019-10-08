@@ -71,22 +71,21 @@ class _CustomMapState extends StateWithBag<CustomMap> {
   }
 }
 
-//class MarkerInfo {
-//  final Marker marker;
-//  final ImageStreamListener listener;
-//  MarkerInfo()
-//}
+class _MarkerInfo {
+  Marker marker;
+  Function() loadCompleter;
+}
 
 class MarkerCreator implements Disposable {
-  final Set<Marker> _markers = {};
-  final Map<Place, Marker> _placeMarker = {};
-  //final Map<ImageStreamCompleter, ImageStreamListener> _imageStreams = {};
+  final Map<Place, _MarkerInfo> _placeMarker = {};
   final BehaviorSubject<Set<Marker>> _markersSubject =
       BehaviorSubject.seeded({});
   ui.Image _placeholder;
+  Future<Function()> _placeholderCompleter;
 
   MarkerCreator() {
-    _loadPlaceholder();
+    _placeholderCompleter = _loadImage(
+        AssetImage('images/placeholder.png'), (image) => _placeholder = image);
   }
 
   Observable<Set<Marker>> get markers => _markersSubject;
@@ -95,16 +94,8 @@ class MarkerCreator implements Disposable {
     _refreshMarkers(places);
   }
 
-  Future<Function()> _loadPlaceholder() async {
-    ImageProvider provider = AssetImage('images/placeholder.png');
-    var load = provider.load(await provider.obtainKey(ImageConfiguration()));
-    var listener = ImageStreamListener((info, _) => _placeholder = info.image);
-    load.addListener(listener);
-    return () => load.removeListener(listener);
-  }
-
-  Future<Function()> _loadImage(String url, Function(ui.Image) func) async {
-    ImageProvider provider = CachedNetworkImageProvider(url);
+  Future<Function()> _loadImage(
+      ImageProvider provider, Function(ui.Image) func) async {
     var load = provider.load(await provider.obtainKey(ImageConfiguration()));
     var listener = ImageStreamListener((info, _) => func(info.image));
     load.addListener(listener);
@@ -112,47 +103,50 @@ class MarkerCreator implements Disposable {
   }
 
   _loadImageAndCreateMarker(Place place) async {
-    await _addMarkerToList(place, _placeholder);
+    _placeMarker[place] = _MarkerInfo();
+    if (_placeholder != null) {
+      await _createMarker(place, _placeholder);
+    }
+
     if (place.imageUrl != null) {
-      var remover = await _loadImage(
-          place.imageUrl, (image) => _addMarkerToList(place, image));
+      var remover = await _loadImage(CachedNetworkImageProvider(place.imageUrl),
+          (image) => _createMarker(place, image));
+      _placeMarker[place]?.loadCompleter = remover;
     }
   }
 
-  _addMarkerToList(Place place, ui.Image image) async {
-    final Uint8List markerIcon = await _createMarker(120, image);
+  _createMarker(Place place, ui.Image image) async {
+    final Uint8List markerIcon = await _drawMarker(120, image);
     var marker = Marker(
         markerId: MarkerId(place.name),
         infoWindow: InfoWindow(title: place.name, snippet: place.about),
         position: LatLng(place.lat, place.lng),
         icon: BitmapDescriptor.fromBytes(markerIcon));
-
     _addMarker(place, marker);
   }
 
   _addMarker(Place place, Marker marker) {
-    _removeMarker(place);
-    _placeMarker[place] = marker;
-    _markers.add(marker);
-    _markersSubject.add(_markers);
+    _placeMarker[place].marker = marker;
+    _markersSubject.add(_placeMarker.values.map((v) => v.marker).toSet());
   }
 
   _refreshMarkers(List<Place> places) {
     var toLoad = places.where((p) => !_placeMarker.keys.contains(p));
     var toDelete = _placeMarker.keys.where((p) => !places.contains(p));
     toDelete.forEach(_removeMarker);
-    _markersSubject.add(_markers);
+    _markersSubject.add(_placeMarker.values.map((v) => v.marker).toSet());
+
     toLoad.forEach(_loadImageAndCreateMarker);
   }
 
   _removeMarker(Place place) {
-    if (_placeMarker[place] != null) {
-      _markers.remove(_placeMarker[place]);
-      _placeMarker.remove(place);
+    if (_placeMarker[place].loadCompleter != null) {
+      _placeMarker[place].loadCompleter();
     }
+    _placeMarker.remove(place);
   }
 
-  Future<Uint8List> _createMarker(int height, ui.Image image) async {
+  Future<Uint8List> _drawMarker(int height, ui.Image image) async {
     final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
     final Canvas canvas = Canvas(pictureRecorder);
 
@@ -190,6 +184,11 @@ class MarkerCreator implements Disposable {
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    for (var val in _placeMarker.values) {
+      if (val.loadCompleter != null) {
+        val.loadCompleter();
+      }
+    }
+    _placeholderCompleter.then((f) => f());
   }
 }
