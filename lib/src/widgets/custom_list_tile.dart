@@ -11,6 +11,7 @@ class CustomListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       child: InkWell(
@@ -31,11 +32,11 @@ class CustomListTile extends StatelessWidget {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(12.0, 2.0, 2.0, 0.0),
-                  child: _buildInfoWidget(_place, Theme.of(context)),
+                  child: _buildInfoWidget(_place, theme),
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.my_location),
+                icon: Icon(Icons.my_location, color: theme.accentColor,),
                 onPressed: () {
                   if (onLocationButtonPressed != null) {
                     onLocationButtonPressed();

@@ -130,8 +130,8 @@ class _Map extends StatelessWidget {
         stream: bloc.places,
         builder: (_, snapshot) {
           return CustomMap(
-            bloc,
             places: snapshot.data ?? [],
+            locationUpdater: bloc.location,
           );
         });
   }

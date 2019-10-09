@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_maps/src/blocs/main_bloc.dart';
 import 'package:flutter_maps/src/models/place.dart';
 import 'package:flutter_maps/src/support_classes/disposable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -12,8 +11,15 @@ import 'package:rxdart/rxdart.dart';
 
 class CustomMap extends StatefulWidget {
   final List<Place> places;
-  final MainBloc bloc;
-  CustomMap(this.bloc, {this.places = const []});
+  final LatLng startLocation;
+  final double startZoom;
+  final Stream<LatLng> locationUpdater;
+
+  CustomMap(
+      {this.places = const [],
+      this.startLocation = const LatLng(53.9, 27.56667),
+      this.startZoom = 11,
+      this.locationUpdater});
 
   @override
   _CustomMapState createState() => _CustomMapState();
@@ -21,16 +27,17 @@ class CustomMap extends StatefulWidget {
 
 class _CustomMapState extends StateWithBag<CustomMap> {
   final MarkerCreator markerCreator = MarkerCreator();
-  static const LatLng blr = LatLng(53.9, 27.56667);
   GoogleMapController mapController;
 
   @override
   void setupBindings() {
-    bag += widget.bloc.location.listen((location) {
-      mapController?.animateCamera(
-        CameraUpdate.newLatLng(location),
-      );
-    });
+    if(widget.locationUpdater != null) {
+      bag += widget.locationUpdater.listen((location) {
+        mapController?.animateCamera(
+          CameraUpdate.newLatLng(location),
+        );
+      });
+    }
   }
 
   @override
@@ -58,7 +65,8 @@ class _CustomMapState extends StateWithBag<CustomMap> {
       builder: (_, snapshot) {
         final Set<Marker> markers = snapshot.hasData ? snapshot.data : {};
         return GoogleMap(
-          initialCameraPosition: const CameraPosition(target: blr, zoom: 9),
+          initialCameraPosition:
+              CameraPosition(target: widget.startLocation, zoom: widget.startZoom),
           myLocationButtonEnabled: false,
           onMapCreated: (controller) => mapController = controller,
           markers: markers,
@@ -124,17 +132,21 @@ class MarkerCreator implements Disposable {
 
   _addMarker(Place place, Marker marker) {
     _placeMarker[place].marker = marker;
-    _markersSubject.add(_placeMarker.values.map((v) => v.marker)
-        .where((v) => v != null).toSet());
+    _markersSubject.add(_placeMarker.values
+        .map((v) => v.marker)
+        .where((v) => v != null)
+        .toSet());
   }
 
   _refreshMarkers(List<Place> places) {
     var toLoad = places.where((p) => !_placeMarker.keys.contains(p));
     var toDelete = _placeMarker.keys.where((p) => !places.contains(p));
-    if(toDelete.length > 0) {
+    if (toDelete.length > 0) {
       toDelete.forEach(_removeMarker);
-      _markersSubject.add(_placeMarker.values.map((v) => v.marker)
-          .where((v) => v != null).toSet());
+      _markersSubject.add(_placeMarker.values
+          .map((v) => v.marker)
+          .where((v) => v != null)
+          .toSet());
     }
     toLoad.forEach(_loadImageAndCreateMarker);
   }
