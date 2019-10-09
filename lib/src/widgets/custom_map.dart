@@ -14,12 +14,16 @@ class CustomMap extends StatefulWidget {
   final LatLng startLocation;
   final double startZoom;
   final Stream<LatLng> locationUpdater;
+  final bool gesturesEnabled;
 
   CustomMap(
       {this.places = const [],
+      Key key,
       this.startLocation = const LatLng(53.9, 27.56667),
       this.startZoom = 11,
-      this.locationUpdater});
+      this.locationUpdater,
+      this.gesturesEnabled = true})
+      : super(key: key);
 
   @override
   _CustomMapState createState() => _CustomMapState();
@@ -31,7 +35,7 @@ class _CustomMapState extends StateWithBag<CustomMap> {
 
   @override
   void setupBindings() {
-    if(widget.locationUpdater != null) {
+    if (widget.locationUpdater != null) {
       bag += widget.locationUpdater.listen((location) {
         mapController?.animateCamera(
           CameraUpdate.newLatLng(location),
@@ -65,10 +69,13 @@ class _CustomMapState extends StateWithBag<CustomMap> {
       builder: (_, snapshot) {
         final Set<Marker> markers = snapshot.hasData ? snapshot.data : {};
         return GoogleMap(
-          initialCameraPosition:
-              CameraPosition(target: widget.startLocation, zoom: widget.startZoom),
+          initialCameraPosition: CameraPosition(
+              target: widget.startLocation, zoom: widget.startZoom),
           myLocationButtonEnabled: false,
           onMapCreated: (controller) => mapController = controller,
+          scrollGesturesEnabled: widget.gesturesEnabled,
+          rotateGesturesEnabled: widget.gesturesEnabled,
+          zoomGesturesEnabled: widget.gesturesEnabled,
           markers: markers,
         );
       },
@@ -111,6 +118,10 @@ class MarkerCreator implements Disposable {
     _placeMarker[place] = _MarkerInfo();
     if (_placeholder != null) {
       await _createMarker(place, _placeholder);
+    } else if (place.imageUrl == null) {
+      var remover = await _loadImage(AssetImage('images/placeholder.png'),
+          (image) => _createMarker(place, image));
+      _placeMarker[place]?.loadCompleter = remover;
     }
 
     if (place.imageUrl != null) {

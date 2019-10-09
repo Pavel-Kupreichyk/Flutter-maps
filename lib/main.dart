@@ -63,7 +63,7 @@ class App extends StatelessWidget {
         newScreen = SettingsScreenBuilder();
         break;
       case NavigationInfo.placeInfo:
-        newScreen = PlaceInfoScreenBuilder();
+        newScreen = PlaceInfoScreenBuilder(settings.arguments);
         break;
       default:
         throw Exception('Invalid route: ${settings.name}');

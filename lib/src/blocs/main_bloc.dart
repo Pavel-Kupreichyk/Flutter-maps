@@ -34,7 +34,7 @@ class MainBloc implements Disposable {
   }
 
   itemSelected(Place place) {
-    _navigate.add(NavigationInfo(ScreenType.placeInfo));
+    _navigate.add(NavigationInfo(ScreenType.placeInfo, args: place));
   }
 
   addButtonPressed() async {
