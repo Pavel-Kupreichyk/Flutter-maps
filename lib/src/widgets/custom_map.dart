@@ -135,7 +135,7 @@ class MarkerCreator implements Disposable {
     final Uint8List markerIcon = await _drawMarker(120, image);
     var marker = Marker(
         markerId: MarkerId(place.name),
-        infoWindow: InfoWindow(title: place.name, snippet: place.about),
+        infoWindow: InfoWindow(title: place.name),
         position: LatLng(place.lat, place.lng),
         icon: BitmapDescriptor.fromBytes(markerIcon));
     _addMarker(place, marker);
