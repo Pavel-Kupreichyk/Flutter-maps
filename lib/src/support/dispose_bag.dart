@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter_maps/src/support_classes/disposable.dart';
+import 'package:flutter_maps/src/support/disposable.dart';
 
 class DisposeBag implements Disposable{
   final List<StreamSubscription> _bag = [];

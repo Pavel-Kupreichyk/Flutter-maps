@@ -1,38 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/place_info_bloc.dart';
-import 'package:flutter_maps/src/models/place.dart';
 import 'package:flutter_maps/src/widgets/custom_map.dart';
-import 'package:provider/provider.dart';
 
-class PlaceInfoScreenBuilder extends StatelessWidget {
-  final Place _arg;
-
-  PlaceInfoScreenBuilder(this._arg);
-
-  @override
-  Widget build(BuildContext context) {
-    return Provider<PlaceInfoBloc>(
-      builder: (_) => PlaceInfoBloc(_arg),
-      dispose: (_, bloc) => bloc.dispose(),
-      child: Consumer<PlaceInfoBloc>(
-        builder: (_, bloc, __) => Scaffold(
-          body: PlaceInfoScreen(bloc),
-        ),
-      ),
-    );
-  }
-}
-
-class PlaceInfoScreen extends StatefulWidget {
+class PlaceInfoScreenBody extends StatefulWidget {
   final PlaceInfoBloc bloc;
-  PlaceInfoScreen(this.bloc);
+  PlaceInfoScreenBody(this.bloc);
 
   @override
-  _PlaceInfoScreenState createState() => _PlaceInfoScreenState();
+  _PlaceInfoScreenBodyState createState() => _PlaceInfoScreenBodyState();
 }
 
-class _PlaceInfoScreenState extends State<PlaceInfoScreen> {
+class _PlaceInfoScreenBodyState extends State<PlaceInfoScreenBody> {
   @override
   Widget build(BuildContext context) {
     final place = widget.bloc.place;

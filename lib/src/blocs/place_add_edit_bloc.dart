@@ -2,7 +2,7 @@ import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/services/geolocation_service.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:location/location.dart';
-import 'package:flutter_maps/src/support_classes/disposable.dart';
+import 'package:flutter_maps/src/support/disposable.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:flutter_maps/src/models/place.dart';
 import 'package:image_picker/image_picker.dart';
@@ -57,11 +57,11 @@ class AddEditPlaceBloc implements Disposable {
       var loadingTask = await _firestoreService.addNewPlace(user,
           name, about, _image.value, location.latitude, location.longitude);
       if (loadingTask == null) {
-        _popWithMessage.add('Place added successfully');
+        _popWithMessage.add('Place has been successfully added.');
       } else {
         _uploadManager.addFirebaseUpload(loadingTask, '${name}_image');
         _popWithMessage
-            .add('Place added successfully, but image is still uploading');
+            .add('Place has been successfully added.');
       }
     }
     _isLoading.sink.add(false);

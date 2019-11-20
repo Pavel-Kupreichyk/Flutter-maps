@@ -1,5 +1,5 @@
 import 'package:flutter_maps/src/managers/style_manager.dart';
-import 'package:flutter_maps/src/support_classes/disposable.dart';
+import 'package:flutter_maps/src/support/disposable.dart';
 import 'package:rxdart/rxdart.dart';
 
 class SettingsBloc implements Disposable {

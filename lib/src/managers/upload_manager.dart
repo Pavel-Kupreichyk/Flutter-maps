@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_maps/src/models/upload_snapshot.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:flutter_maps/src/support_classes/disposable.dart';
+import 'package:flutter_maps/src/support/disposable.dart';
 
 class _Upload {
   final StorageUploadTask task;

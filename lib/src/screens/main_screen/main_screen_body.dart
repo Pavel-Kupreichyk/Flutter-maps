@@ -1,49 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/main_bloc.dart';
 import 'package:flutter_maps/src/models/place.dart';
-import 'package:flutter_maps/src/services/auth_service.dart';
-import 'package:flutter_maps/src/services/firestore_service.dart';
-import 'package:flutter_maps/src/support_classes/alert_presenter.dart';
-import 'package:flutter_maps/src/support_classes/state_with_bag.dart';
+import 'package:flutter_maps/src/support/alert_presenter.dart';
+import 'package:flutter_maps/src/support/bindable_state.dart';
 import 'package:flutter_maps/src/widgets/custom_list_tile.dart';
 import 'package:flutter_maps/src/widgets/custom_layout_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_maps/src/widgets/custom_map.dart';
-import 'package:flutter_maps/src/widgets/custom_drawer.dart';
 
-class MainScreenBuilder extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ProxyProvider2<FirestoreService, AuthService, MainBloc>(
-      builder: (_, firestore, auth, __) => MainBloc(firestore, auth),
-      dispose: (_, bloc) => bloc.dispose(),
-      child: Consumer<MainBloc>(
-        builder: (_, bloc, __) => Scaffold(
-          appBar: AppBar(
-            title: Text('Map App'),
-          ),
-          drawer: CustomDrawerBuilder(),
-          body: MainScreen(bloc),
-          floatingActionButton: FloatingActionButton(
-              child: const Icon(
-                Icons.add,
-              ),
-              onPressed: () => bloc.addButtonPressed()),
-        ),
-      ),
-    );
-  }
-}
-
-class MainScreen extends StatefulWidget {
+class MainScreenBody extends StatefulWidget {
   final MainBloc bloc;
-  MainScreen(this.bloc);
+  MainScreenBody(this.bloc);
 
   @override
-  State<StatefulWidget> createState() => _MainScreenState();
+  State<StatefulWidget> createState() => _MainScreenBodyState();
 }
 
-class _MainScreenState extends StateWithBag<MainScreen> {
+class _MainScreenBodyState extends BindableState<MainScreenBody> {
   @override
   void setupBindings() {
     bag += widget.bloc.navigate.listen((navInfo) async {

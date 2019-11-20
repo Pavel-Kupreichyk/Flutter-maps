@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/custom_drawer_bloc.dart';
-import 'package:flutter_maps/src/support_classes/alert_presenter.dart';
+import 'package:flutter_maps/src/support/alert_presenter.dart';
 import 'package:flutter_maps/src/managers/upload_manager.dart';
 import 'package:flutter_maps/src/models/upload_snapshot.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
-import 'package:flutter_maps/src/support_classes/state_with_bag.dart';
+import 'package:flutter_maps/src/support/bindable_state.dart';
 import 'package:flutter_maps/src/widgets/custom_progress_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -31,11 +31,11 @@ class CustomDrawer extends StatefulWidget {
   _CustomDrawerState createState() => _CustomDrawerState();
 }
 
-class _CustomDrawerState extends StateWithBag<CustomDrawer> {
+class _CustomDrawerState extends BindableState<CustomDrawer> {
   @override
   void setupBindings() {
     bag += widget.bloc.userLoggedOut.listen((_) {
-      AlertPresenter.showStandardSnackBar(context, 'You logged out');
+      AlertPresenter.showStandardSnackBar(context, 'You have been logged out.');
       Navigator.pop(context);
     });
 

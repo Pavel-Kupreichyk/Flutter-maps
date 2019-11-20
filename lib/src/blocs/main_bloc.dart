@@ -3,7 +3,7 @@ import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:flutter_maps/src/models/place.dart';
-import 'package:flutter_maps/src/support_classes/disposable.dart';
+import 'package:flutter_maps/src/support/disposable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MainBloc implements Disposable {

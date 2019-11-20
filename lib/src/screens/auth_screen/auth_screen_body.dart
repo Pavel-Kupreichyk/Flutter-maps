@@ -1,58 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/auth_bloc.dart';
-import 'package:flutter_maps/src/services/auth_service.dart';
-import 'package:flutter_maps/src/services/firestore_service.dart';
-import 'package:flutter_maps/src/support_classes/state_with_bag.dart';
+import 'package:flutter_maps/src/support/bindable_state.dart';
 
-import 'package:provider/provider.dart';
-
-class AuthScreenBuilder extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ProxyProvider2<AuthService, FirestoreService, AuthBloc>(
-      builder: (_, auth, store, __) => AuthBloc(auth, store),
-      dispose: (_, bloc) => bloc.dispose(),
-      child: Consumer<AuthBloc>(
-        builder: (_, bloc, __) => Scaffold(
-          appBar: AppBar(
-            title: Text('Authentication'),
-            actions: <Widget>[
-              StreamBuilder<bool>(
-                stream: bloc.isLoading,
-                builder: (_, snapshot) {
-                  if (snapshot.hasData && snapshot.data) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 15),
-                      child: Center(
-                          child: SizedBox(
-                              width: 30,
-                              height: 30,
-                              child: CircularProgressIndicator())),
-                    );
-                  }
-                  return Container();
-                },
-              )
-            ],
-          ),
-          body: AuthScreen(bloc),
-        ),
-      ),
-    );
-  }
-}
-
-class AuthScreen extends StatefulWidget {
+class AuthScreenBody extends StatefulWidget {
   final AuthBloc bloc;
-
-  AuthScreen(this.bloc);
+  AuthScreenBody(this.bloc);
 
   @override
-  State<StatefulWidget> createState() => _AuthScreenState();
+  State<StatefulWidget> createState() => _AuthScreenBodyState();
 }
 
-class _AuthScreenState extends StateWithBag<AuthScreen> {
+class _AuthScreenBodyState extends BindableState<AuthScreenBody> {
   final _formKey = new GlobalKey<FormState>();
   String _email = '';
   String _password = '';

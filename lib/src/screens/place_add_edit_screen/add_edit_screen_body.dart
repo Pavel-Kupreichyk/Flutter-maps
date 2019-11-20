@@ -1,52 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/place_add_edit_bloc.dart';
-import 'package:flutter_maps/src/models/place.dart';
-import 'package:flutter_maps/src/services/auth_service.dart';
-import 'package:flutter_maps/src/support_classes/alert_presenter.dart';
-import 'package:flutter_maps/src/managers/upload_manager.dart';
-import 'package:flutter_maps/src/services/firestore_service.dart';
-import 'package:flutter_maps/src/services/geolocation_service.dart';
-import 'package:flutter_maps/src/support_classes/state_with_bag.dart';
+import 'package:flutter_maps/src/support/alert_presenter.dart';
+import 'package:flutter_maps/src/support/bindable_state.dart';
 import 'package:flutter_maps/src/widgets/animated_bottom_menu.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:provider/provider.dart';
 
-class PlaceScreenBuilder extends StatelessWidget {
-  final Place _arg;
-
-  PlaceScreenBuilder(this._arg);
-
-  @override
-  Widget build(BuildContext context) {
-    return ProxyProvider4<FirestoreService, GeolocationService, UploadManager,
-        AuthService, AddEditPlaceBloc>(
-      builder: (_, firestore, geo, upload, auth, __) =>
-          AddEditPlaceBloc(firestore, geo, upload, auth, _arg),
-      dispose: (_, bloc) => bloc.dispose(),
-      child: Consumer<AddEditPlaceBloc>(
-        builder: (_, bloc, __) => Scaffold(
-          appBar: AppBar(
-            title: Text('Add Place'),
-          ),
-          body: AddEditPlaceScreen(bloc),
-        ),
-      ),
-    );
-  }
-}
-
-class AddEditPlaceScreen extends StatefulWidget {
+class AddEditScreenBody extends StatefulWidget {
   final AddEditPlaceBloc bloc;
 
-  AddEditPlaceScreen(this.bloc);
+  AddEditScreenBody(this.bloc);
 
   @override
-  State<StatefulWidget> createState() => _AddEditPlaceScreenState();
+  State<StatefulWidget> createState() => _AddEditScreenBodyState();
 }
 
-class _AddEditPlaceScreenState extends StateWithBag<AddEditPlaceScreen> {
+class _AddEditScreenBodyState extends BindableState<AddEditScreenBody> {
   @override
   void setupBindings() {
     bag += widget.bloc.error.listen((error) {
@@ -154,7 +124,7 @@ class _PlaceTextForm extends StatefulWidget {
   State<StatefulWidget> createState() => _PlaceTextFormState();
 }
 
-class _PlaceTextFormState extends StateWithBag<_PlaceTextForm> {
+class _PlaceTextFormState extends BindableState<_PlaceTextForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _aboutController = TextEditingController();

@@ -4,9 +4,9 @@ import 'dart:ui' as ui;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/models/place.dart';
-import 'package:flutter_maps/src/support_classes/disposable.dart';
+import 'package:flutter_maps/src/support/disposable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:flutter_maps/src/support_classes/state_with_bag.dart';
+import 'package:flutter_maps/src/support/bindable_state.dart';
 import 'package:rxdart/rxdart.dart';
 
 class CustomMap extends StatefulWidget {
@@ -29,7 +29,7 @@ class CustomMap extends StatefulWidget {
   _CustomMapState createState() => _CustomMapState();
 }
 
-class _CustomMapState extends StateWithBag<CustomMap> {
+class _CustomMapState extends BindableState<CustomMap> {
   final MarkerCreator markerCreator = MarkerCreator();
   GoogleMapController mapController;
 

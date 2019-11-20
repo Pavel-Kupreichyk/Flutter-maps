@@ -1,14 +1,12 @@
-import 'package:flutter_maps/src/support_classes/dispose_bag.dart';
+import 'package:flutter_maps/src/support/dispose_bag.dart';
 import 'package:flutter/material.dart';
 
-abstract class StateWithBag<T extends StatefulWidget> extends State<T> {
+abstract class BindableState<T extends StatefulWidget> extends State<T> {
   DisposeBag bag = DisposeBag();
 
   void setupBindings();
 
-  bool shouldRebindAfterUpdate(T oldWidget) {
-    return true;
-  }
+  bool shouldRebindAfterUpdate(T oldWidget) => false;
 
   @override
   void initState() {
