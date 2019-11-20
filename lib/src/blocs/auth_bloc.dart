@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:rxdart/rxdart.dart';
@@ -49,11 +48,7 @@ class AuthBloc implements Disposable {
       _popWithMessage.add('You have been logged in.');
     }
     catch(error) {
-      if(Platform.isIOS) {
-        _error.sink.add(error.message);
-      } else {
-        _error.sink.add(error.details);
-      }
+      _error.sink.add(error.message);
     } finally {
       _isLoading.add(false);
     }
