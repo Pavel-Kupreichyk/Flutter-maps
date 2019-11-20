@@ -41,52 +41,56 @@ class _AddEditScreenBodyState extends BindableState<AddEditScreenBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        SafeArea(
-          child: ListView(
-            children: <Widget>[
-              Center(
-                child: StreamBuilder<File>(
-                  stream: widget.bloc.image,
-                  builder: (_, snapshot) {
-                    return _buildImageView(snapshot.data);
-                  },
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+      child: Stack(
+        children: <Widget>[
+          SafeArea(
+            child: ListView(
+              children: <Widget>[
+                Center(
+                  child: StreamBuilder<File>(
+                    stream: widget.bloc.image,
+                    builder: (_, snapshot) {
+                      return _buildImageView(snapshot.data);
+                    },
+                  ),
                 ),
-              ),
-              Center(
-                child: _PlaceTextForm(widget.bloc),
-              ),
-            ],
+                Center(
+                  child: _PlaceTextForm(widget.bloc),
+                ),
+              ],
+            ),
           ),
-        ),
-        StreamBuilder<bool>(
-          stream: widget.bloc.bottomMenuState,
-          builder: (_, snapshot) {
-            return AnimatedBottomMenu(
-              isOpen: snapshot.data ?? false,
-              onButtonPressed: (type) {
-                switch (type) {
-                  case ButtonType.camera:
-                    widget.bloc.addImage(ImageSource.camera);
-                    break;
-                  case ButtonType.gallery:
-                    widget.bloc.addImage(ImageSource.gallery);
-                    break;
-                  case ButtonType.remove:
-                    widget.bloc.removeImage();
-                    break;
-                }
-              },
-            );
-          },
-        ),
-      ],
+          StreamBuilder<bool>(
+            stream: widget.bloc.bottomMenuState,
+            builder: (_, snapshot) {
+              return AnimatedBottomMenu(
+                isOpen: snapshot.data ?? false,
+                onButtonPressed: (type) {
+                  switch (type) {
+                    case ButtonType.camera:
+                      widget.bloc.addImage(ImageSource.camera);
+                      break;
+                    case ButtonType.gallery:
+                      widget.bloc.addImage(ImageSource.gallery);
+                      break;
+                    case ButtonType.remove:
+                      widget.bloc.removeImage();
+                      break;
+                  }
+                },
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
   _requestPermission() async {
-    AlertPresenter.showPermissionDialog(context);
+    await AlertPresenter.showPermissionDialog(context);
     widget.bloc.requestLocationPermission();
   }
 
