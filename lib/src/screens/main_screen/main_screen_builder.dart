@@ -3,7 +3,7 @@ import 'package:flutter_maps/src/blocs/main_bloc.dart';
 import 'package:flutter_maps/src/screens/main_screen/main_screen_body.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
-import 'package:flutter_maps/src/widgets/custom_drawer.dart';
+import 'package:flutter_maps/src/widgets/custom_drawer/custom_drawer_builder.dart';
 import 'package:provider/provider.dart';
 
 class MainScreenBuilder extends StatefulWidget {

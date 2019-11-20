@@ -17,7 +17,7 @@ class _AuthScreenBuilderState extends State<AuthScreenBuilder> {
   Widget build(BuildContext context) {
     return ProxyProvider2<AuthService, FirestoreService, AuthBloc>(
       builder: (_, auth, store, __) =>
-      _bloc = _bloc == null ? AuthBloc(auth, store) : _bloc,
+          _bloc = _bloc == null ? AuthBloc(auth, store) : _bloc,
       dispose: (_, bloc) => bloc.dispose(),
       child: Consumer<AuthBloc>(
         builder: (_, bloc, __) => Scaffold(

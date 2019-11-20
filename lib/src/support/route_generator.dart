@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/screens/auth_screen/auth_screen_builder.dart';
 import 'package:flutter_maps/src/screens/main_screen/main_screen_builder.dart';
-import 'package:flutter_maps/src/screens/navigation_info.dart';
-import 'package:flutter_maps/src/screens/place_add_edit_screen/add_edit_screen_builder.dart';
+import 'package:flutter_maps/src/support/navigation_info.dart';
+import 'package:flutter_maps/src/screens/add_edit_screen/add_edit_screen_builder.dart';
 import 'package:flutter_maps/src/screens/place_info_screen/place_info_screen_builder.dart';
 import 'package:flutter_maps/src/screens/settings_screen/settings_screen_builder.dart';
 

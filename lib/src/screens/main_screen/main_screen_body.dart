@@ -20,7 +20,7 @@ class _MainScreenBodyState extends BindableState<MainScreenBody> {
   @override
   void setupBindings() {
     bag += widget.bloc.navigate.listen((navInfo) async {
-      var res = await Navigator.pushNamed(context, navInfo.getRoute(),
+      var res = await Navigator.pushNamed(context, navInfo.route,
           arguments: navInfo.args);
       if (res != null) {
         AlertPresenter.showStandardSnackBar(context, res);

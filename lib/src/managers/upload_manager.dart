@@ -14,7 +14,7 @@ class _Upload {
 
   close() {
     subscription?.cancel();
-    if(task.isInProgress) {
+    if (task.isInProgress) {
       task.cancel();
     }
   }
@@ -30,7 +30,7 @@ class UploadManager implements Disposable {
 
   addFirebaseUpload(StorageUploadTask uploadTask, String name) {
     var upload = _Upload(uploadTask);
-    upload.subscription= uploadTask.events.listen((event) {
+    upload.subscription = uploadTask.events.listen((event) {
       UploadState state;
       switch (event.type) {
         case StorageTaskEventType.progress:

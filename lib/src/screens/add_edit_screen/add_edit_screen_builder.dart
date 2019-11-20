@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/place_add_edit_bloc.dart';
 import 'package:flutter_maps/src/managers/upload_manager.dart';
 import 'package:flutter_maps/src/models/place.dart';
-import 'package:flutter_maps/src/screens/place_add_edit_screen/add_edit_screen_body.dart';
+import 'package:flutter_maps/src/screens/add_edit_screen/add_edit_screen_body.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:flutter_maps/src/services/geolocation_service.dart';

@@ -1,27 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/custom_drawer_bloc.dart';
 import 'package:flutter_maps/src/support/alert_presenter.dart';
-import 'package:flutter_maps/src/managers/upload_manager.dart';
 import 'package:flutter_maps/src/models/upload_snapshot.dart';
-import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/support/bindable_state.dart';
 import 'package:flutter_maps/src/widgets/custom_progress_bar.dart';
-import 'package:provider/provider.dart';
-
-class CustomDrawerBuilder extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Consumer2<UploadManager, AuthService>(
-      builder: (_, upload, auth, __) => Provider<CustomDrawerBloc>(
-        builder: (_) => CustomDrawerBloc(upload, auth),
-        dispose: (_, bloc) => bloc.dispose(),
-        child: Consumer<CustomDrawerBloc>(
-          builder: (_, bloc, __) => CustomDrawer(bloc),
-        ),
-      ),
-    );
-  }
-}
 
 class CustomDrawer extends StatefulWidget {
   final CustomDrawerBloc bloc;
@@ -41,7 +23,7 @@ class _CustomDrawerState extends BindableState<CustomDrawer> {
 
     bag += widget.bloc.navigate.listen((navInfo) {
       Navigator.pop(context);
-      Navigator.pushNamed(context, navInfo.getRoute(), arguments: navInfo.args);
+      Navigator.pushNamed(context, navInfo.route, arguments: navInfo.args);
     });
   }
 

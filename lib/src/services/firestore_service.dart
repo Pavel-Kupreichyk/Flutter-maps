@@ -73,7 +73,8 @@ class FirestoreService {
             doc[PlaceCollection.userId],
             doc[PlaceCollection.username],
             doc[PlaceCollection.name],
-            await _getImageUrl('${doc[PlaceCollection.userId]}_${doc[PlaceCollection.name]}'),
+            await _getImageUrl(
+                '${doc[PlaceCollection.userId]}_${doc[PlaceCollection.name]}'),
             doc[PlaceCollection.about],
             doc[PlaceCollection.lat],
             doc[PlaceCollection.lng]));

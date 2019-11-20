@@ -1,4 +1,4 @@
-import 'package:flutter_maps/src/screens/navigation_info.dart';
+import 'package:flutter_maps/src/support/navigation_info.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_maps/src/blocs/main_bloc.dart';

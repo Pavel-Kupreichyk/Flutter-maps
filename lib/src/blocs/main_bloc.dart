@@ -1,4 +1,4 @@
-import 'package:flutter_maps/src/screens/navigation_info.dart';
+import 'package:flutter_maps/src/support/navigation_info.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:rxdart/rxdart.dart';
@@ -34,15 +34,15 @@ class MainBloc implements Disposable {
   }
 
   itemSelected(Place place) {
-    _navigate.add(NavigationInfo(ScreenType.placeInfo, args: place));
+    _navigate.add(NavigationInfo.placeInfo(place));
   }
 
   addButtonPressed() async {
     var user = await _authService.getCurrentUser();
     if (user != null) {
-      _navigate.add(NavigationInfo(ScreenType.placeAdd));
+      _navigate.add(NavigationInfo.addEdit(null));
     } else {
-      _navigate.add(NavigationInfo(ScreenType.auth));
+      _navigate.add(NavigationInfo.auth());
     }
   }
 

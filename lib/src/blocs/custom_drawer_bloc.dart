@@ -1,6 +1,6 @@
 import 'package:flutter_maps/src/managers/upload_manager.dart';
 import 'package:flutter_maps/src/models/upload_snapshot.dart';
-import 'package:flutter_maps/src/screens/navigation_info.dart';
+import 'package:flutter_maps/src/support/navigation_info.dart';
 import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/support/disposable.dart';
 import 'package:rxdart/rxdart.dart';
@@ -27,7 +27,7 @@ class CustomDrawerBloc implements Disposable {
   }
 
   moveToSettings() {
-    _navigate.add(NavigationInfo(ScreenType.settings));
+    _navigate.add(NavigationInfo.settings());
   }
 
   logOut() async {
