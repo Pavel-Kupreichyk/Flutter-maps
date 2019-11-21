@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_maps/src/blocs/place_info_bloc.dart';
-import 'package:flutter_maps/src/widgets/custom_map.dart';
+import 'package:flutter_maps/src/widgets/custom_map/custom_map.dart';
 
 class PlaceInfoScreenBody extends StatefulWidget {
   final PlaceInfoBloc bloc;

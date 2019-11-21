@@ -6,7 +6,7 @@ import 'package:flutter_maps/src/support/bindable_state.dart';
 import 'package:flutter_maps/src/widgets/custom_list_tile.dart';
 import 'package:flutter_maps/src/widgets/custom_layout_builder.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_maps/src/widgets/custom_map.dart';
+import 'package:flutter_maps/src/widgets/custom_map/custom_map.dart';
 
 class MainScreenBody extends StatefulWidget {
   final MainBloc bloc;
