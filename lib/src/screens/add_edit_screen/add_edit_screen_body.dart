@@ -29,7 +29,8 @@ class _AddEditScreenBodyState extends BindableState<AddEditScreenBody> {
           AlertPresenter.showDisabledDialog(context);
           break;
         case AddEditBlocError.notLoggedIn:
-          AlertPresenter.showNotLoggedInDialog(context);
+          AlertPresenter.showNotLoggedInDialog(context)
+              .then((_) => Navigator.pop(context, null));
           break;
         case AddEditBlocError.unexpectedError:
           AlertPresenter.showErrorDialog(context);

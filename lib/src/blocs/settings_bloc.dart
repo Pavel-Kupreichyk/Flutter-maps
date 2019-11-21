@@ -4,12 +4,11 @@ import 'package:rxdart/rxdart.dart';
 
 class SettingsBloc implements Disposable {
   final StyleManager _styleManager;
-  BehaviorSubject<bool> _nightModeState;
+  final BehaviorSubject<bool> _nightModeState;
 
-  SettingsBloc(this._styleManager) {
-    _nightModeState =
-        BehaviorSubject.seeded(_styleManager.currentAppStyle == AppStyle.night);
-  }
+  SettingsBloc(this._styleManager)
+      : _nightModeState = BehaviorSubject.seeded(
+            _styleManager.currentAppStyle == AppStyle.night);
 
   Observable<bool> get nightModeState => _nightModeState;
 

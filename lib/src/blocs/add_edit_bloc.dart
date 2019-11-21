@@ -24,18 +24,17 @@ class AddEditBloc implements Disposable {
   final UploadManager _uploadManager;
   final AuthService _authService;
 
-  BehaviorSubject<Place> _place;
-  BehaviorSubject<File> _image = BehaviorSubject();
-  BehaviorSubject<bool> _bottomMenuState = BehaviorSubject.seeded(false);
-  BehaviorSubject<bool> _isLoading = BehaviorSubject.seeded(false);
-  PublishSubject<AddEditBlocError> _error = PublishSubject();
-  PublishSubject<String> _popWithMessage = PublishSubject();
+  final BehaviorSubject<Place> _place;
+  final BehaviorSubject<File> _image = BehaviorSubject();
+  final BehaviorSubject<bool> _bottomMenuState = BehaviorSubject.seeded(false);
+  final BehaviorSubject<bool> _isLoading = BehaviorSubject.seeded(false);
+  final PublishSubject<AddEditBlocError> _error = PublishSubject();
+  final PublishSubject<String> _popWithMessage = PublishSubject();
 
   AddEditBloc(this._firestoreService, this._geolocationService,
       this._uploadManager, this._authService,
-      [Place place]) {
-    _place = BehaviorSubject.seeded(place);
-  }
+      [Place place])
+      : _place = BehaviorSubject.seeded(place);
 
   //Outputs
 
@@ -49,7 +48,7 @@ class AddEditBloc implements Disposable {
   //Input functions
 
   addPlace(String name, String about) async {
-    _isLoading.sink.add(true);
+    _isLoading.add(true);
     final user = await _getUserOrEmitError();
     final location = await _getLocationOrEmitError();
 
@@ -61,16 +60,13 @@ class AddEditBloc implements Disposable {
       }
       _popWithMessage.add('Place has been successfully added.');
     }
-    _isLoading.sink.add(false);
+    _isLoading.add(false);
   }
 
-  requestLocationPermission() async {
-    await _geolocationService.requestGeolocationServicePermission();
-  }
+  requestLocationPermission() async =>
+      await _geolocationService.requestGeolocationServicePermission();
 
-  addPhotoButtonPressed() async {
-    _bottomMenuState.add(true);
-  }
+  addPhotoButtonPressed() => _bottomMenuState.add(true);
 
   addImage(ImageSource source) async {
     var image = await ImagePicker.pickImage(
@@ -87,21 +83,19 @@ class AddEditBloc implements Disposable {
     _image.add(null);
   }
 
-  //Private functions
-
   Future<LocationData> _getLocationOrEmitError() async {
     try {
       return await _geolocationService.getCurrentLocation();
     } on GeoServiceException catch (error) {
       switch (error.type) {
         case GeoServiceError.permissionNotProvided:
-          _error.sink.add(AddEditBlocError.permissionNotProvided);
+          _error.add(AddEditBlocError.permissionNotProvided);
           break;
         case GeoServiceError.servicesDisabled:
-          _error.sink.add(AddEditBlocError.servicesDisabled);
+          _error.add(AddEditBlocError.servicesDisabled);
           break;
         case GeoServiceError.unexpectedError:
-          _error.sink.add(AddEditBlocError.unexpectedError);
+          _error.add(AddEditBlocError.unexpectedError);
           break;
       }
     }
@@ -111,8 +105,7 @@ class AddEditBloc implements Disposable {
   Future<String> _getUserOrEmitError() async {
     final user = await _authService.getCurrentUser();
     if (user == null) {
-      _error.sink.add(AddEditBlocError.notLoggedIn);
-      _popWithMessage.add(null);
+      _error.add(AddEditBlocError.notLoggedIn);
     }
     return user;
   }

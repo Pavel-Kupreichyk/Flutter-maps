@@ -9,10 +9,11 @@ class AuthBloc implements Disposable {
   final AuthService _authService;
   final FirestoreService _firestoreService;
 
-  BehaviorSubject<FormMode> _formMode = BehaviorSubject.seeded(FormMode.login);
-  BehaviorSubject<String> _error = BehaviorSubject();
-  BehaviorSubject<bool> _isLoading = BehaviorSubject.seeded(false);
-  PublishSubject<String> _popWithMessage = PublishSubject();
+  final BehaviorSubject<FormMode> _formMode =
+      BehaviorSubject.seeded(FormMode.login);
+  final BehaviorSubject<String> _error = BehaviorSubject();
+  final BehaviorSubject<bool> _isLoading = BehaviorSubject.seeded(false);
+  final PublishSubject<String> _popWithMessage = PublishSubject();
 
   AuthBloc(this._authService, this._firestoreService);
 
@@ -21,13 +22,13 @@ class AuthBloc implements Disposable {
   Observable<String> get error => _error;
   Observable<bool> get isLoading => _isLoading;
   Observable<String> get popWithMessage => _popWithMessage;
-  
+
   //Input functions
   changeMode() {
-    if(_formMode.value == FormMode.login) {
-      _formMode.sink.add(FormMode.signup);
+    if (_formMode.value == FormMode.login) {
+      _formMode.add(FormMode.signup);
     } else {
-      _formMode.sink.add(FormMode.login);
+      _formMode.add(FormMode.login);
     }
   }
 
@@ -41,14 +42,13 @@ class AuthBloc implements Disposable {
           var id = await _authService.signUp(email, password);
           await _firestoreService.addNewUser(id, username);
         } else {
-          _error.sink.add('Username already exists');
+          _error.add('Username already exists');
           return;
         }
       }
       _popWithMessage.add('You have been logged in.');
-    }
-    catch(error) {
-      _error.sink.add(error.message);
+    } catch (error) {
+      _error.add(error.message);
     } finally {
       _isLoading.add(false);
     }

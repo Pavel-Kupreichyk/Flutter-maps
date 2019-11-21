@@ -10,9 +10,9 @@ class MainBloc implements Disposable {
   final FirestoreService _firestoreService;
   final AuthService _authService;
 
-  BehaviorSubject<List<Place>> _places = BehaviorSubject();
-  BehaviorSubject<LatLng> _location = BehaviorSubject();
-  PublishSubject<NavigationInfo> _navigate = PublishSubject();
+  final BehaviorSubject<List<Place>> _places = BehaviorSubject();
+  final BehaviorSubject<LatLng> _location = BehaviorSubject();
+  final PublishSubject<NavigationInfo> _navigate = PublishSubject();
 
   MainBloc(this._firestoreService, this._authService) {
     refreshPlaces();

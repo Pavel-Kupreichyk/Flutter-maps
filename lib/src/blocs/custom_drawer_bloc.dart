@@ -9,9 +9,9 @@ class CustomDrawerBloc implements Disposable {
   final UploadManager _uploadManager;
   final AuthService _authService;
 
-  BehaviorSubject<bool> _isUserLoggedIn = BehaviorSubject();
-  PublishSubject<void> _userLoggedOut = PublishSubject();
-  PublishSubject<NavigationInfo> _navigate = PublishSubject();
+  final BehaviorSubject<bool> _isUserLoggedIn = BehaviorSubject();
+  final PublishSubject<void> _userLoggedOut = PublishSubject();
+  final PublishSubject<NavigationInfo> _navigate = PublishSubject();
 
   CustomDrawerBloc(this._uploadManager, this._authService) {
     _getUser();
@@ -22,26 +22,22 @@ class CustomDrawerBloc implements Disposable {
   Observable<void> get userLoggedOut => _userLoggedOut;
   Observable<NavigationInfo> get navigate => _navigate;
 
-  removeUpload(String name) {
-    _uploadManager.removeUpload(name);
-  }
+  removeUpload(String name) => _uploadManager.removeUpload(name);
 
-  moveToSettings() {
-    _navigate.add(NavigationInfo.settings());
-  }
+  moveToSettings() => _navigate.add(NavigationInfo.settings());
 
   logOut() async {
     await _authService.signOut();
-    _isUserLoggedIn.sink.add(false);
-    _userLoggedOut.sink.add(null);
+    _isUserLoggedIn.add(false);
+    _userLoggedOut.add(null);
   }
 
   _getUser() async {
     var user = await _authService.getCurrentUser();
     if (user == null) {
-      _isUserLoggedIn.sink.add(false);
+      _isUserLoggedIn.add(false);
     } else {
-      _isUserLoggedIn.sink.add(true);
+      _isUserLoggedIn.add(true);
     }
   }
 
