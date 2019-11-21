@@ -12,7 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   final prefs = await SharedPreferences.getInstance();
   final style = StyleManager(prefs);
-  final routeGenerator = RouteGenerator();
 
   runApp(MultiProvider(
     providers: <SingleChildCloneableWidget>[
@@ -22,7 +21,7 @@ void main() async {
       Provider<UploadManager>.value(value: UploadManager()),
       Provider<StyleManager>.value(value: style),
     ],
-    child: App(style, routeGenerator),
+    child: App(style, RouteGenerator()),
   ));
 }
 

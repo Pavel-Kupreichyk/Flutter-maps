@@ -17,32 +17,24 @@ class AnimatedBottomMenu extends StatefulWidget {
 
 class AnimatedBottomMenuState extends State<AnimatedBottomMenu>
     with SingleTickerProviderStateMixin {
-  static const double menuHeight = 80;
-  static const double blurRadius = 20;
+  static const double _menuHeight = 80;
+  static const double _blurRadius = 20;
   AnimationController _controller;
   Animation<double> _animation;
-  ThemeData theme;
 
   @override
   void initState() {
     super.initState();
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 200));
-    _animation = Tween<double>(begin: menuHeight + blurRadius, end: 0)
-        .animate(_controller)
-          ..addListener(() => setState(() {}));
-    _animateMenu();
-  }
-
-  @override
-  void didChangeDependencies() {
-    theme = Theme.of(context);
-    super.didChangeDependencies();
+    _animation = Tween<double>(begin: _menuHeight + _blurRadius, end: 0)
+        .animate(_controller);
+    widget.isOpen ? _controller.forward() : _controller.reverse();
   }
 
   @override
   void didUpdateWidget(AnimatedBottomMenu oldWidget) {
-    _animateMenu();
+    widget.isOpen ? _controller.forward() : _controller.reverse();
     super.didUpdateWidget(oldWidget);
   }
 
@@ -54,21 +46,28 @@ class AnimatedBottomMenuState extends State<AnimatedBottomMenu>
 
   @override
   Widget build(BuildContext context) {
-    if (_animation.value == (menuHeight + blurRadius)) {
-      return Container();
-    }
-
-    return Transform.translate(
-      offset: Offset(0, _animation.value),
+    var theme = Theme.of(context);
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (_, panel) {
+        if (_animation.value == (_menuHeight + _blurRadius)) {
+          return Container();
+        }
+        return Transform.translate(
+          offset: Offset(0, _animation.value),
+          child: panel,
+        );
+      },
       child: Align(
         alignment: FractionalOffset.bottomCenter,
         child: Container(
-          height: menuHeight,
+          height: _menuHeight,
           decoration: BoxDecoration(
+            color: theme.bottomAppBarColor,
             boxShadow: [
               BoxShadow(
                 color: theme.accentColor,
-                blurRadius: blurRadius,
+                blurRadius: _blurRadius,
                 spreadRadius: 1.0,
                 offset: Offset(
                   8.0,
@@ -76,7 +75,6 @@ class AnimatedBottomMenuState extends State<AnimatedBottomMenu>
                 ),
               )
             ],
-            color: theme.bottomAppBarColor,
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -85,45 +83,25 @@ class AnimatedBottomMenuState extends State<AnimatedBottomMenu>
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    _MenuButton(
+                    _buildMenuButton(
                       width: 60,
-                      height: menuHeight,
                       child: const Icon(Icons.image),
-                      onClick: () {
-                        if (widget.onButtonPressed != null) {
-                          widget.onButtonPressed(ButtonType.gallery);
-                        }
-                        _controller.reverse();
-                      },
+                      buttonType: ButtonType.gallery,
                     ),
-                    _MenuButton(
+                    _buildMenuButton(
                       width: 60,
-                      height: menuHeight,
                       child: const Icon(Icons.camera_alt),
-                      onClick: () {
-                        if (widget.onButtonPressed != null) {
-                          widget.onButtonPressed(ButtonType.camera);
-                        }
-                        _controller.reverse();
-                      },
+                      buttonType: ButtonType.camera,
                     ),
-                    _MenuButton(
+                    _buildMenuButton(
                       width: 60,
-                      height: menuHeight,
                       child: const Icon(Icons.close),
-                      onClick: () {
-                        if (widget.onButtonPressed != null) {
-                          widget.onButtonPressed(ButtonType.remove);
-                        }
-                        _controller.reverse();
-                      },
+                      buttonType: ButtonType.remove,
                     ),
                   ],
                 ),
-                _MenuButton(
-                  height: menuHeight,
+                _buildMenuButton(
                   child: const Text('Hide Panel'),
-                  onClick: _controller.reverse,
                 ),
               ],
             ),
@@ -133,31 +111,18 @@ class AnimatedBottomMenuState extends State<AnimatedBottomMenu>
     );
   }
 
-  _animateMenu() {
-    if (widget.isOpen) {
-      _controller.forward();
-    } else {
-      _controller.reverse();
-    }
-  }
-}
-
-class _MenuButton extends StatelessWidget {
-  final double height;
-  final double width;
-  final Widget child;
-  final Function onClick;
-
-  _MenuButton({this.child, this.height, this.width, this.onClick});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildMenuButton({Widget child, double width, ButtonType buttonType}) {
     return Container(
-      height: height,
+      height: _menuHeight,
       width: width,
       child: FlatButton(
         child: child,
-        onPressed: onClick,
+        onPressed: () {
+          if (widget.onButtonPressed != null && buttonType != null) {
+            widget.onButtonPressed(buttonType);
+          }
+          _controller.reverse();
+        },
       ),
     );
   }
