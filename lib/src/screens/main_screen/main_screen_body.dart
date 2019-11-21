@@ -62,34 +62,33 @@ class _PlacesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var bloc = Provider.of<MainBloc>(context);
-    return StreamBuilder<List<Place>>(
+    return Expanded(
+      child: StreamBuilder<List<Place>>(
         stream: bloc.places,
         builder: (_, snapshot) {
           if (!snapshot.hasData) {
-            return const Expanded(
-                child: Center(
-              child: CircularProgressIndicator(),
-            ));
+            return Center(child: CircularProgressIndicator());
           }
-          return Expanded(
-            child: RefreshIndicator(
-              onRefresh: () => bloc.refreshPlaces(),
-              child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: snapshot.data?.length ?? 0,
-                itemBuilder: (_, id) {
-                  var place = snapshot.data[id];
-                  return CustomListTile(
-                    place,
-                    onLocationButtonPressed: () =>
-                        bloc.showLocation(place.lat, place.lng),
-                    onItemSelected: () => bloc.itemSelected(place),
-                  );
-                },
-              ),
+
+          return RefreshIndicator(
+            onRefresh: () => bloc.refreshPlaces(),
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: snapshot.data?.length ?? 0,
+              itemBuilder: (_, id) {
+                var place = snapshot.data[id];
+                return CustomListTile(
+                  place,
+                  onLocationButtonPressed: () =>
+                      bloc.showLocation(place.lat, place.lng),
+                  onItemSelected: () => bloc.itemSelected(place),
+                );
+              },
             ),
           );
-        });
+        },
+      ),
+    );
   }
 }
 
@@ -100,12 +99,13 @@ class _Map extends StatelessWidget {
   Widget build(BuildContext context) {
     var bloc = Provider.of<MainBloc>(context);
     return StreamBuilder<List<Place>>(
-        stream: bloc.places,
-        builder: (_, snapshot) {
-          return CustomMap(
-            places: snapshot.data ?? [],
-            locationUpdater: bloc.location,
-          );
-        });
+      stream: bloc.places,
+      builder: (_, snapshot) {
+        return CustomMap(
+          places: snapshot.data ?? [],
+          locationUpdater: bloc.location,
+        );
+      },
+    );
   }
 }

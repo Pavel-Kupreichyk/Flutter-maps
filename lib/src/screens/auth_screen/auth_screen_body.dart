@@ -182,7 +182,7 @@ class _AuthScreenBodyState extends BindableState<AuthScreenBody> {
     final form = _formKey.currentState;
     if (form.validate()) {
       form.save();
-      widget.bloc.submit(_email, _password, _username);
+      widget.bloc.submit(_email, _password, _username.toLowerCase());
     }
   }
 }

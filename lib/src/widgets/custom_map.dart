@@ -103,7 +103,17 @@ class MarkerCreator implements Disposable {
   Observable<Set<Marker>> get markers => _markersSubject;
 
   createMarkers(List<Place> places) {
-    _refreshMarkers(places);
+    var toLoad = places.where((p) => !_placeMarker.keys.contains(p));
+    var toDelete =
+        List<Place>.from(_placeMarker.keys.where((p) => !places.contains(p)));
+    if (toDelete.length > 0) {
+      toDelete.forEach(_removeMarker);
+      _markersSubject.add(_placeMarker.values
+          .map((v) => v.marker)
+          .where((v) => v != null)
+          .toSet());
+    }
+    toLoad.forEach(_loadImageAndCreateMarker);
   }
 
   Future<Function()> _loadImage(
@@ -147,19 +157,6 @@ class MarkerCreator implements Disposable {
         .map((v) => v.marker)
         .where((v) => v != null)
         .toSet());
-  }
-
-  _refreshMarkers(List<Place> places) {
-    var toLoad = places.where((p) => !_placeMarker.keys.contains(p));
-    var toDelete = _placeMarker.keys.where((p) => !places.contains(p));
-    if (toDelete.length > 0) {
-      toDelete.forEach(_removeMarker);
-      _markersSubject.add(_placeMarker.values
-          .map((v) => v.marker)
-          .where((v) => v != null)
-          .toSet());
-    }
-    toLoad.forEach(_loadImageAndCreateMarker);
   }
 
   _removeMarker(Place place) {

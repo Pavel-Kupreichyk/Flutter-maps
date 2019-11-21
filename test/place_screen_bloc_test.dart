@@ -1,6 +1,6 @@
 import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_maps/src/blocs/place_add_edit_bloc.dart';
+import 'package:flutter_maps/src/blocs/add_edit_bloc.dart';
 import 'package:location/location.dart';
 import 'package:mockito/mockito.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
@@ -30,7 +30,7 @@ void main() {
   });
 
   test('place stream emits null if place has not been added to init func', () {
-    final bloc = AddEditPlaceBloc(
+    final bloc = AddEditBloc(
         firestoreService, geolocationService, uploadManager, authService);
 
     expect(bloc.place, emits(null));
@@ -39,14 +39,14 @@ void main() {
   test('place stream emits place that has been added to init func', () {
     final testPlace = Place('test', '12435', 'name1', null, 'test', 1, 1);
 
-    final bloc = AddEditPlaceBloc(firestoreService, geolocationService,
+    final bloc = AddEditBloc(firestoreService, geolocationService,
         uploadManager, authService, testPlace);
 
     expect(bloc.place, emits(testPlace));
   });
 
   test('addPlace calls addNewPlace with right data', () async {
-    final bloc = AddEditPlaceBloc(
+    final bloc = AddEditBloc(
         firestoreService, geolocationService, uploadManager, authService);
     LocationData location =
         LocationData.fromMap({'latitude': 23, 'longitude': 54.3});
@@ -66,7 +66,7 @@ void main() {
   test(
       'error stream emits permissionNotProvided error if '
       'geolocation service throws permissionNotProvided exception', () {
-    final bloc = AddEditPlaceBloc(
+    final bloc = AddEditBloc(
         firestoreService, geolocationService, uploadManager, authService);
 
     when(geolocationService.getCurrentLocation())
@@ -74,7 +74,7 @@ void main() {
 
     when(authService.getCurrentUser()).thenAnswer((_) async => '123456');
 
-    expect(bloc.error, emits(AddEditPlaceBlocError.permissionNotProvided));
+    expect(bloc.error, emits(AddEditBlocError.permissionNotProvided));
     bloc.addPlace('test', 'test');
   });
 }

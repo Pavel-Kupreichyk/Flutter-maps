@@ -57,12 +57,12 @@ class AlertPresenter {
             ));
   }
 
-  static showStandardSnackBar(BuildContext context, String text) {
-    var snackBar = SnackBar(
-      content: Text(
-        text,
-      ),
-    );
-    Scaffold.of(context).showSnackBar(snackBar);
-  }
+  static showStandardSnackBar(BuildContext context, String text) =>
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            text,
+          ),
+        ),
+      );
 }

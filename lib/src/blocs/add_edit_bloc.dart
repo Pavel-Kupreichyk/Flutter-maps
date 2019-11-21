@@ -9,16 +9,16 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_maps/src/managers/upload_manager.dart';
 import 'dart:io';
 
-enum AddEditPlaceBlocError {
+enum AddEditBlocError {
   permissionNotProvided,
   servicesDisabled,
   notLoggedIn,
   unexpectedError
 }
 
-enum AddEditPlaceBlocResult { PlaceAdded, PlaceAddedAndImageIsLoading }
+enum AddEditBlocResult { PlaceAdded, PlaceAddedAndImageIsLoading }
 
-class AddEditPlaceBloc implements Disposable {
+class AddEditBloc implements Disposable {
   final FirestoreService _firestoreService;
   final GeolocationService _geolocationService;
   final UploadManager _uploadManager;
@@ -28,10 +28,10 @@ class AddEditPlaceBloc implements Disposable {
   BehaviorSubject<File> _image = BehaviorSubject();
   BehaviorSubject<bool> _bottomMenuState = BehaviorSubject.seeded(false);
   BehaviorSubject<bool> _isLoading = BehaviorSubject.seeded(false);
-  PublishSubject<AddEditPlaceBlocError> _error = PublishSubject();
+  PublishSubject<AddEditBlocError> _error = PublishSubject();
   PublishSubject<String> _popWithMessage = PublishSubject();
 
-  AddEditPlaceBloc(this._firestoreService, this._geolocationService,
+  AddEditBloc(this._firestoreService, this._geolocationService,
       this._uploadManager, this._authService,
       [Place place]) {
     _place = BehaviorSubject.seeded(place);
@@ -40,7 +40,7 @@ class AddEditPlaceBloc implements Disposable {
   //Outputs
 
   Observable<Place> get place => _place;
-  Observable<AddEditPlaceBlocError> get error => _error;
+  Observable<AddEditBlocError> get error => _error;
   Observable<bool> get bottomMenuState => _bottomMenuState;
   Observable<bool> get isLoading => _isLoading;
   Observable<File> get image => _image;
@@ -54,15 +54,12 @@ class AddEditPlaceBloc implements Disposable {
     final location = await _getLocationOrEmitError();
 
     if (location != null && user != null) {
-      var loadingTask = await _firestoreService.addNewPlace(user,
-          name, about, _image.value, location.latitude, location.longitude);
-      if (loadingTask == null) {
-        _popWithMessage.add('Place has been successfully added.');
-      } else {
+      var loadingTask = await _firestoreService.addNewPlace(user, name, about,
+          _image.value, location.latitude, location.longitude);
+      if (loadingTask != null) {
         _uploadManager.addFirebaseUpload(loadingTask, '${name}_image');
-        _popWithMessage
-            .add('Place has been successfully added.');
       }
+      _popWithMessage.add('Place has been successfully added.');
     }
     _isLoading.sink.add(false);
   }
@@ -98,13 +95,13 @@ class AddEditPlaceBloc implements Disposable {
     } on GeoServiceException catch (error) {
       switch (error.type) {
         case GeoServiceError.permissionNotProvided:
-          _error.sink.add(AddEditPlaceBlocError.permissionNotProvided);
+          _error.sink.add(AddEditBlocError.permissionNotProvided);
           break;
         case GeoServiceError.servicesDisabled:
-          _error.sink.add(AddEditPlaceBlocError.servicesDisabled);
+          _error.sink.add(AddEditBlocError.servicesDisabled);
           break;
         case GeoServiceError.unexpectedError:
-          _error.sink.add(AddEditPlaceBlocError.unexpectedError);
+          _error.sink.add(AddEditBlocError.unexpectedError);
           break;
       }
     }
@@ -113,8 +110,8 @@ class AddEditPlaceBloc implements Disposable {
 
   Future<String> _getUserOrEmitError() async {
     final user = await _authService.getCurrentUser();
-    if(user == null) {
-      _error.sink.add(AddEditPlaceBlocError.notLoggedIn);
+    if (user == null) {
+      _error.sink.add(AddEditBlocError.notLoggedIn);
       _popWithMessage.add(null);
     }
     return user;

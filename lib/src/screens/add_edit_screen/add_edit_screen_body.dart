@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_maps/src/blocs/place_add_edit_bloc.dart';
+import 'package:flutter_maps/src/blocs/add_edit_bloc.dart';
 import 'package:flutter_maps/src/support/alert_presenter.dart';
 import 'package:flutter_maps/src/support/bindable_state.dart';
 import 'package:flutter_maps/src/widgets/animated_bottom_menu.dart';
@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class AddEditScreenBody extends StatefulWidget {
-  final AddEditPlaceBloc bloc;
+  final AddEditBloc bloc;
 
   AddEditScreenBody(this.bloc);
 
@@ -21,16 +21,17 @@ class _AddEditScreenBodyState extends BindableState<AddEditScreenBody> {
   void setupBindings() {
     bag += widget.bloc.error.listen((error) {
       switch (error) {
-        case AddEditPlaceBlocError.permissionNotProvided:
-          _requestPermission();
+        case AddEditBlocError.permissionNotProvided:
+          AlertPresenter.showPermissionDialog(context)
+              .then((_) => widget.bloc.requestLocationPermission());
           break;
-        case AddEditPlaceBlocError.servicesDisabled:
+        case AddEditBlocError.servicesDisabled:
           AlertPresenter.showDisabledDialog(context);
           break;
-        case AddEditPlaceBlocError.notLoggedIn:
+        case AddEditBlocError.notLoggedIn:
           AlertPresenter.showNotLoggedInDialog(context);
           break;
-        case AddEditPlaceBlocError.unexpectedError:
+        case AddEditBlocError.unexpectedError:
           AlertPresenter.showErrorDialog(context);
           break;
       }
@@ -89,11 +90,6 @@ class _AddEditScreenBodyState extends BindableState<AddEditScreenBody> {
     );
   }
 
-  _requestPermission() async {
-    await AlertPresenter.showPermissionDialog(context);
-    widget.bloc.requestLocationPermission();
-  }
-
   Widget _buildImageView([File image]) {
     return Stack(
       children: <Widget>[
@@ -122,7 +118,7 @@ class _AddEditScreenBodyState extends BindableState<AddEditScreenBody> {
 }
 
 class _PlaceTextForm extends StatefulWidget {
-  final AddEditPlaceBloc bloc;
+  final AddEditBloc bloc;
   _PlaceTextForm(this.bloc);
   @override
   State<StatefulWidget> createState() => _PlaceTextFormState();

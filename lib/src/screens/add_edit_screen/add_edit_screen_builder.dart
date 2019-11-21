@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_maps/src/blocs/place_add_edit_bloc.dart';
+import 'package:flutter_maps/src/blocs/add_edit_bloc.dart';
 import 'package:flutter_maps/src/managers/upload_manager.dart';
 import 'package:flutter_maps/src/models/place.dart';
 import 'package:flutter_maps/src/screens/add_edit_screen/add_edit_screen_body.dart';
@@ -18,16 +18,16 @@ class AddEditScreenBuilder extends StatefulWidget {
 }
 
 class _AddEditScreenBuilderState extends State<AddEditScreenBuilder> {
-  AddEditPlaceBloc _bloc;
+  AddEditBloc _bloc;
   @override
   Widget build(BuildContext context) {
     return ProxyProvider4<FirestoreService, GeolocationService, UploadManager,
-        AuthService, AddEditPlaceBloc>(
+        AuthService, AddEditBloc>(
       builder: (_, firestore, geo, upload, auth, __) => _bloc = _bloc == null
-          ? AddEditPlaceBloc(firestore, geo, upload, auth, widget._arg)
+          ? AddEditBloc(firestore, geo, upload, auth, widget._arg)
           : _bloc,
       dispose: (_, bloc) => bloc.dispose(),
-      child: Consumer<AddEditPlaceBloc>(
+      child: Consumer<AddEditBloc>(
         builder: (_, bloc, __) => Scaffold(
           appBar: AppBar(
             title: Text('Add Place'),
