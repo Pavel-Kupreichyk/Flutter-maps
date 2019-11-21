@@ -24,20 +24,18 @@ class MainBloc implements Disposable {
   Observable<NavigationInfo> get navigate => _navigate;
 
   //Input functions
-  refreshPlaces() async {
+  Future refreshPlaces() async {
     var places = await _firestoreService.fetchPlaces();
     _places.sink.add(places);
   }
 
-  showLocation(double lat, double lng) {
-    _location.sink.add(LatLng(lat, lng));
-  }
+  void showLocation(double lat, double lng) =>
+      _location.sink.add(LatLng(lat, lng));
 
-  itemSelected(Place place) {
-    _navigate.add(NavigationInfo.placeInfo(place));
-  }
+  void itemSelected(Place place) =>
+      _navigate.add(NavigationInfo.placeInfo(place));
 
-  addButtonPressed() async {
+  Future addButtonPressed() async {
     var user = await _authService.getCurrentUser();
     if (user != null) {
       _navigate.add(NavigationInfo.addEdit(null));

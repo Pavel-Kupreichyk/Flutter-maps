@@ -22,17 +22,17 @@ class CustomDrawerBloc implements Disposable {
   Observable<void> get userLoggedOut => _userLoggedOut;
   Observable<NavigationInfo> get navigate => _navigate;
 
-  removeUpload(String name) => _uploadManager.removeUpload(name);
+  void removeUpload(String name) => _uploadManager.removeUpload(name);
 
-  moveToSettings() => _navigate.add(NavigationInfo.settings());
+  void moveToSettings() => _navigate.add(NavigationInfo.settings());
 
-  logOut() async {
+  Future logOut() async {
     await _authService.signOut();
     _isUserLoggedIn.add(false);
     _userLoggedOut.add(null);
   }
 
-  _getUser() async {
+  Future _getUser() async {
     var user = await _authService.getCurrentUser();
     if (user == null) {
       _isUserLoggedIn.add(false);

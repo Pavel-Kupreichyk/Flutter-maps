@@ -24,7 +24,7 @@ class AuthBloc implements Disposable {
   Observable<String> get popWithMessage => _popWithMessage;
 
   //Input functions
-  changeMode() {
+  void changeMode() {
     if (_formMode.value == FormMode.login) {
       _formMode.add(FormMode.signup);
     } else {
@@ -32,7 +32,7 @@ class AuthBloc implements Disposable {
     }
   }
 
-  submit(String email, String password, String username) async {
+  Future submit(String email, String password, String username) async {
     _isLoading.add(true);
     try {
       if (_formMode.value == FormMode.login) {

@@ -20,7 +20,6 @@ abstract class _UserCollection {
 }
 
 class FirestoreService {
-
   Future<StorageUploadTask> addNewPlace(String userId, String name,
       String about, File img, double lat, double lng) async {
     var user = await Firestore.instance
@@ -54,7 +53,7 @@ class FirestoreService {
     return res.documents.isEmpty;
   }
 
-  addNewUser(String userId, String username) async {
+  Future addNewUser(String userId, String username) async {
     await Firestore.instance
         .collection(_UserCollection.key)
         .document(userId)
@@ -65,8 +64,9 @@ class FirestoreService {
   }
 
   Future<List<Place>> fetchPlaces() async {
-    var snapshot =
-        await Firestore.instance.collection(_PlaceCollection.key).getDocuments();
+    var snapshot = await Firestore.instance
+        .collection(_PlaceCollection.key)
+        .getDocuments();
     List<Place> result = [];
     if (snapshot != null) {
       for (var doc in snapshot.documents) {

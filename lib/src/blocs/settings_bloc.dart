@@ -12,7 +12,7 @@ class SettingsBloc implements Disposable {
 
   Observable<bool> get nightModeState => _nightModeState;
 
-  setNightMode(bool state) {
+  void setNightMode(bool state) {
     _nightModeState.add(state);
     _styleManager.setAppStyle(state ? AppStyle.night : AppStyle.regular);
   }

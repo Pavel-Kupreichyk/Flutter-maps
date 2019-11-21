@@ -18,7 +18,7 @@ class StyleManager {
     _appStyle = BehaviorSubject.seeded(currentAppStyle);
   }
 
-  setAppStyle(AppStyle style) {
+  void setAppStyle(AppStyle style) {
     _sharedPreferences.setInt('app_style', style.index);
     _appStyle.add(style);
   }

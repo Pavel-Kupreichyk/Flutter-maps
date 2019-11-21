@@ -16,8 +16,6 @@ enum AddEditBlocError {
   unexpectedError
 }
 
-enum AddEditBlocResult { PlaceAdded, PlaceAddedAndImageIsLoading }
-
 class AddEditBloc implements Disposable {
   final FirestoreService _firestoreService;
   final GeolocationService _geolocationService;
@@ -47,7 +45,7 @@ class AddEditBloc implements Disposable {
 
   //Input functions
 
-  addPlace(String name, String about) async {
+  Future addPlace(String name, String about) async {
     _isLoading.add(true);
     final user = await _getUserOrEmitError();
     final location = await _getLocationOrEmitError();
@@ -63,12 +61,14 @@ class AddEditBloc implements Disposable {
     _isLoading.add(false);
   }
 
-  requestLocationPermission() async =>
+  Future requestLocationPermission() async =>
       await _geolocationService.requestGeolocationServicePermission();
 
-  addPhotoButtonPressed() => _bottomMenuState.add(true);
+  void addPhotoButtonPressed() => _bottomMenuState.add(true);
 
-  addImage(ImageSource source) async {
+  void removeImage() => _image.add(null);
+
+  Future addImage(ImageSource source) async {
     var image = await ImagePicker.pickImage(
       source: source,
       maxWidth: 1000,
@@ -77,10 +77,6 @@ class AddEditBloc implements Disposable {
     if (image != null) {
       _image.add(image);
     }
-  }
-
-  removeImage() {
-    _image.add(null);
   }
 
   Future<LocationData> _getLocationOrEmitError() async {

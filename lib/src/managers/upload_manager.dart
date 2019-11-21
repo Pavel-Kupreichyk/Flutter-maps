@@ -12,7 +12,7 @@ class _Upload {
 
   _Upload(this.task);
 
-  close() {
+  void close() {
     subscription?.cancel();
     if (task.isInProgress) {
       task.cancel();
@@ -23,12 +23,12 @@ class _Upload {
 class UploadManager implements Disposable {
   final Map<String, _Upload> _uploads = {};
 
-  BehaviorSubject<List<UploadSnapshot>> _snapshots = BehaviorSubject();
+  final BehaviorSubject<List<UploadSnapshot>> _snapshots = BehaviorSubject();
 
   //Outputs
   Observable<List<UploadSnapshot>> get snapshots => _snapshots;
 
-  addFirebaseUpload(StorageUploadTask uploadTask, String name) {
+  void addFirebaseUpload(StorageUploadTask uploadTask, String name) {
     var upload = _Upload(uploadTask);
     upload.subscription = uploadTask.events.listen((event) {
       UploadState state;
@@ -56,28 +56,20 @@ class UploadManager implements Disposable {
     _uploads[name] = upload;
   }
 
-  pauseUpload(String name) {
-    _uploads[name].task.pause();
-  }
+  void pauseUpload(String name) => _uploads[name].task.pause();
 
-  resumeUpload(String name) {
-    _uploads[name].task.resume();
-  }
+  void resumeUpload(String name) => _uploads[name].task.resume();
 
-  removeUpload(String name) {
+  void removeUpload(String name) {
     _uploads[name].close();
     _uploads.remove(name);
     _emitSnapshots();
   }
 
-  _emitSnapshots() {
-    var snapshots = _uploads.values
-        .map((upload) => upload.currSnapshot)
-        .where((el) => el != null)
-        .toList();
-
-    _snapshots.sink.add(snapshots);
-  }
+  void _emitSnapshots() => _snapshots.sink.add(_uploads.values
+      .map((upload) => upload.currSnapshot)
+      .where((el) => el != null)
+      .toList());
 
   @override
   void dispose() {
