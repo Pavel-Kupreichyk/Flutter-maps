@@ -6,19 +6,12 @@ import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:flutter_maps/src/widgets/custom_drawer/custom_drawer_builder.dart';
 import 'package:provider/provider.dart';
 
-class MainScreenBuilder extends StatefulWidget {
-  @override
-  _MainScreenBuilderState createState() => _MainScreenBuilderState();
-}
-
-class _MainScreenBuilderState extends State<MainScreenBuilder> {
-  MainBloc _bloc;
-
+class MainScreenBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProxyProvider2<FirestoreService, AuthService, MainBloc>(
-      builder: (_, firestore, auth, __) =>
-      _bloc = _bloc == null ? MainBloc(firestore, auth) : _bloc,
+      builder: (_, firestore, auth, prevBloc) =>
+          prevBloc ?? MainBloc(firestore, auth),
       dispose: (_, bloc) => bloc.dispose(),
       child: Consumer<MainBloc>(
         builder: (_, bloc, __) => Scaffold(

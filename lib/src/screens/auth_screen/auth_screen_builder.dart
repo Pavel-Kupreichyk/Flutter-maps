@@ -5,19 +5,11 @@ import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:provider/provider.dart';
 
-class AuthScreenBuilder extends StatefulWidget {
-  @override
-  _AuthScreenBuilderState createState() => _AuthScreenBuilderState();
-}
-
-class _AuthScreenBuilderState extends State<AuthScreenBuilder> {
-  AuthBloc _bloc;
-
+class AuthScreenBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProxyProvider2<AuthService, FirestoreService, AuthBloc>(
-      builder: (_, auth, store, __) =>
-          _bloc = _bloc == null ? AuthBloc(auth, store) : _bloc,
+      builder: (_, auth, store, prevBloc) => prevBloc ?? AuthBloc(auth, store),
       dispose: (_, bloc) => bloc.dispose(),
       child: Consumer<AuthBloc>(
         builder: (_, bloc, __) => Scaffold(

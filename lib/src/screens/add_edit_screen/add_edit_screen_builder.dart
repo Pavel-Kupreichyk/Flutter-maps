@@ -8,24 +8,17 @@ import 'package:flutter_maps/src/services/firestore_service.dart';
 import 'package:flutter_maps/src/services/geolocation_service.dart';
 import 'package:provider/provider.dart';
 
-class AddEditScreenBuilder extends StatefulWidget {
+class AddEditScreenBuilder extends StatelessWidget {
   final Place _arg;
 
   AddEditScreenBuilder(this._arg);
 
   @override
-  _AddEditScreenBuilderState createState() => _AddEditScreenBuilderState();
-}
-
-class _AddEditScreenBuilderState extends State<AddEditScreenBuilder> {
-  AddEditBloc _bloc;
-  @override
   Widget build(BuildContext context) {
     return ProxyProvider4<FirestoreService, GeolocationService, UploadManager,
         AuthService, AddEditBloc>(
-      builder: (_, firestore, geo, upload, auth, __) => _bloc = _bloc == null
-          ? AddEditBloc(firestore, geo, upload, auth, widget._arg)
-          : _bloc,
+      builder: (_, firestore, geo, upload, auth, prevBloc) =>
+          prevBloc ?? AddEditBloc(firestore, geo, upload, auth, _arg),
       dispose: (_, bloc) => bloc.dispose(),
       child: Consumer<AddEditBloc>(
         builder: (_, bloc, __) => Scaffold(

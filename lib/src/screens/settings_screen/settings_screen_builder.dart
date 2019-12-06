@@ -4,18 +4,11 @@ import 'package:flutter_maps/src/managers/style_manager.dart';
 import 'package:flutter_maps/src/screens/settings_screen/settings_screen_body.dart';
 import 'package:provider/provider.dart';
 
-class SettingsScreenBuilder extends StatefulWidget {
-  @override
-  _SettingsScreenBuilderState createState() => _SettingsScreenBuilderState();
-}
-
-class _SettingsScreenBuilderState extends State<SettingsScreenBuilder> {
-  SettingsBloc _bloc;
+class SettingsScreenBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProxyProvider<StyleManager, SettingsBloc>(
-      builder: (_, style, __) =>
-          _bloc = _bloc == null ? SettingsBloc(style) : _bloc,
+      builder: (_, style, prevBloc) => prevBloc ?? SettingsBloc(style),
       dispose: (_, bloc) => bloc.dispose(),
       child: Consumer<SettingsBloc>(
         builder: (_, bloc, __) => Scaffold(

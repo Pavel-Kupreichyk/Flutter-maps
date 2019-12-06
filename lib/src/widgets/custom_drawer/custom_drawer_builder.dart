@@ -5,23 +5,15 @@ import 'package:flutter_maps/src/services/auth_service.dart';
 import 'package:flutter_maps/src/widgets/custom_drawer/custom_drawer.dart';
 import 'package:provider/provider.dart';
 
-class CustomDrawerBuilder extends StatefulWidget {
-  @override
-  _CustomDrawerBuilderState createState() => _CustomDrawerBuilderState();
-}
-
-class _CustomDrawerBuilderState extends State<CustomDrawerBuilder> {
-  CustomDrawerBloc _bloc;
+class CustomDrawerBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Consumer2<UploadManager, AuthService>(
-      builder: (_, upload, auth, __) => Provider<CustomDrawerBloc>(
-        builder: (_) =>
-            _bloc = _bloc == null ? CustomDrawerBloc(upload, auth) : _bloc,
-        dispose: (_, bloc) => bloc.dispose(),
-        child: Consumer<CustomDrawerBloc>(
-          builder: (_, bloc, __) => CustomDrawer(bloc),
-        ),
+    return ProxyProvider2<UploadManager, AuthService, CustomDrawerBloc>(
+      builder: (_, upload, auth, prevBloc) =>
+          prevBloc ?? CustomDrawerBloc(upload, auth),
+      dispose: (_, bloc) => bloc.dispose(),
+      child: Consumer<CustomDrawerBloc>(
+        builder: (_, bloc, __) => CustomDrawer(bloc),
       ),
     );
   }
