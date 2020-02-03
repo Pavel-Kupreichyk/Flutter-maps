@@ -43,7 +43,8 @@ class MarkerCreator implements Disposable {
 
   Future<Function()> _loadImage(
       ImageProvider provider, Function(ui.Image) func) async {
-    var load = provider.load(await provider.obtainKey(ImageConfiguration()));
+    var load =
+        provider.load(await provider.obtainKey(ImageConfiguration()),null);
     var listener = ImageStreamListener((info, _) => func(info.image));
     load.addListener(listener);
     return () => load.removeListener(listener);

@@ -10,6 +10,7 @@ import 'package:flutter_maps/src/managers/upload_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final style = StyleManager(prefs);
 
